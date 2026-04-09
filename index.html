@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA_GESTION_TERRITORIAL_TULTEPEC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+        
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; margin: 0; padding: 15px; }
+        
+        .excel-container { background: white; border: 1px solid #ccc; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); overflow: auto; max-height: 92vh; border-radius: 4px; }
+        
+        table { border-collapse: collapse; width: 100%; font-size: 11px; min-width: 1600px; }
+        
+        thead { position: sticky; top: 0; z-index: 10; }
+        
+        th { 
+            background-color: #4b4b4b; color: white; border: 1px solid #666; 
+            padding: 10px 4px; text-align: center; /* Centrado solicitado */
+            font-weight: 600; text-transform: uppercase; font-size: 10px;
+        }
+
+        .header-accent { background-color: #7d6e4d !important; }
+
+        td { border: 1px solid #d1d5db; padding: 6px 8px; color: #374151; white-space: nowrap; }
+        
+        tr:nth-child(even) { background-color: #f9fafb; }
+        tr:hover { background-color: #eff6ff; }
+
+        /* Estilo de Círculo Único */
+        .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; border: 1px solid rgba(0,0,0,0.2); vertical-align: middle; }
+        .dot-red { background-color: #ef4444; }
+        .dot-yellow { background-color: #facc15; }
+        .dot-black { background-color: #000000; }
+
+        .top-bar { background: #7d6e4d; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .search-box { color: black; padding: 4px 12px; border-radius: 4px; border: none; font-size: 12px; width: 350px; outline: none; }
+    </style>
+</head>
+<body>
+
+    <div class="excel-container">
+        <div class="top-bar">
+            <span>SISTEMA DE GESTIÓN TERRITORIAL - TULTEPEC 2026</span>
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar por sección, colonia o referente..." class="search-box">
+        </div>
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>Sección</th>
+                    <th>Localidades / Colonias (Base 2026)</th>
+                    <th>Referente</th>
+                    <th>Delimitadores Geográficos Principales (N/S/E/O)</th>
+                    <th>Tipo Asent.</th>
+                    <th>NSE / Pobreza</th>
+                    <th>Lista Nominal (Est. 2026)</th>
+                    <th>Part. (%)</th>
+                    <th>Votación Est.</th>
+                    <th>Ganador Hist.</th>
+                    <th>Prioridad / Riesgo</th>
+                    <th class="header-accent">Mapa</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Inyección vía JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const rawData = [
+            {s:5452, loc:"Col. Centro, B. El Carmen, B. San Antonio", ref:"Raul Portuguez, Leoncio Protesnico", del:"N: Moctezuma, S: M. Negrete, E: Insurgentes", tipo:"Urbano", nse:"D+ / Media", nom:4250, part:58, win:"MORENA", r:"🟡 Media / Voto duro", m:"Si"},
+            {s:5453, loc:"Col. La Cantera, Col. La Morita", ref:"Yolanda Escobedo", del:"N: Camelias, S: Guadalupe, E: H. Galeana", tipo:"Urbano", nse:"C- / Media", nom:3900, part:55, win:"MORENA", r:"🟡 Media / Cohesión", m:"Si"},
+            {s:5454, loc:"Tepetlixco, Amp. La Piedad, B. La Piedad", ref:"Yolanda Escobedo, Pilar Zuñiga", del:"N: Gladiolas, S: Talleres, E: Insurgentes", tipo:"Urbano", nse:"D / Alta", nom:3850, part:51, win:"MORENA", r:"🔴 Alta / Gestión social", m:"Si"},
+            {s:5455, loc:"El Mirador, Col. México, B. Gpe. Tlazintla", ref:"Gema Oviedo", del:"N: Sta. Cruz, S: Cuauhtémoc, E: F. Sarabia", tipo:"Urbano", nse:"D+ / Media", nom:3700, part:56, win:"MORENA", r:"🟡 Media / Base trad.", m:"Si"},
+            {s:5456, loc:"La Palma, Amado Nervo, Lomas de Tultepec", ref:"Aida, Graciela", del:"N: Blvd. Totoltepec, S: San Antonio", tipo:"Urbano", nse:"C / Media", nom:3200, part:52, win:"MORENA", r:"🔴 Alta / Gremios", m:"Si"},
+            {s:5457, loc:"Vicente Suárez, Lomas, S.A. Xahuento", ref:"Carmen, Aida, Fernando Romero, Gema Oviedo", del:"N: Blvd. Totoltepec, S: 11 Tlalmelaca", tipo:"Urbano", nse:"D+ / Media", nom:2800, part:58, win:"MORENA", r:"🟡 Media / Expansión", m:"Si"},
+            {s:5458, loc:"Col. Las Brisas", ref:"Aida, Graciela", del:"N: Av. San Pablo, S: Guardarraya, E: La Saucera", tipo:"Urbano", nse:"D / Alta", nom:3500, part:49, win:"MORENA", r:"🔴 Alta / Rezago", m:"Si"},
+            {s:5459, loc:"B. Gpe. Tlazintla, B. San Rafael", ref:"Gema Oviedo", del:"N: Cuauhtémoc, S: J.M. Morelos, E: Los Deportes", tipo:"Urbano", nse:"C- / Media", nom:4100, part:57, win:"MORENA", r:"🟡 Media / Blindaje", m:"Si"},
+            {s:5460, loc:"La Morita, Sta. Isabel, El Carmen, S. Antonio", ref:"Leoncio Protesnico, Raúl Portuguez", del:"N: Talleres, S: Moctezuma, E: Insurgentes", tipo:"Urbano", nse:"C- / Media", nom:4300, part:56, win:"MORENA", r:"🟡 Media / Comercial", m:"Si"},
+            {s:5461, loc:"Col. La Cantera", ref:"Yolanda Escobedo", del:"N: Gpe. / Barranca, S: Camino Viejo", tipo:"Urbano", nse:"D+ / Media", nom:4500, part:53, win:"MORENA", r:"🟡 Media / Competitivo", m:"Si"},
+            {s:5462, loc:"San Miguel Otlica, San Juan Xocotla", ref:"Gerardo Ramirez, Daniel Cruz, Gema Oviedo", del:"N: Camino Viejo, S: Matamoros", tipo:"Urbano", nse:"C- / Media", nom:4800, part:50, win:"MORENA", r:"🟡 Media / Voto masivo", m:"Si"},
+            {s:5463, loc:"Residencial Tultepec", ref:"Martha Narvaez, Sandra Lule, Vicky Contreras", del:"N: Nicolás Bravo, S: V. Carranza", tipo:"Urbano", nse:"C / Media", nom:4600, part:54, win:"MORENA", r:"🟡 Media / Vecinal", m:"Si"},
+            {s:5464, loc:"Barrio San Rafael", ref:"(Referente en proceso)", del:"N: J.M. Morelos, S: Miguel Negrete", tipo:"Urbano", nse:"C- / Media", nom:3900, part:52, win:"MORENA", r:"🟡 Media / Límites", m:"Si"},
+            {s:5466, loc:"San Martín Calvario, San Juan Xocotla", ref:"Jesús Vargas, Paco Jivéz, Daniel Cruz", del:"N: V. Carranza, S: Libramiento 2", tipo:"Urbano", nse:"D+ / Media", nom:4400, part:48, win:"MORENA", r:"🔴 Alta / Caída part.", m:"Si"},
+            {s:5467, loc:"Barrio San Juan Xocotla", ref:"Daniel Cruz", del:"N: Matamoros, S: 16 de Septiembre", tipo:"Urbano", nse:"D / Alta", nom:4500, part:46, win:"MORENA", r:"🔴 Alta / Vulnerabilidad", m:"Si"},
+            {s:5468, loc:"Emiquia, Jardines Sta. Cruz, La Cañada", ref:"Imelda, Ximena, Norma, Luisa, Angeles", del:"N: Blvd. Totoltepec, S: Camelias", tipo:"Urbano", nse:"D / Alta", nom:5100, part:45, win:"MORENA", r:"🔴 Alta / Alta abstención", m:"Si"},
+            {s:5473, loc:"Pblo. S. Teyahualco, S. Pablito, Paseos II", ref:"Ismael Fuentes, Lili", del:"N: Av. Toluca, S: C. Morelos", tipo:"Urbano", nse:"D+ / Alta", nom:5000, part:44, win:"MORENA", r:"🔴 Alta / Densidad", m:"Si"},
+            {s:5474, loc:"Fracc. Hacienda Real, Arcos Tultepec", ref:"Lizbeth Luna, Gabriela Olalde", del:"N: Acueducto Río Hondo, S: Av. Hda. Las Rosas", tipo:"Urbano", nse:"C / Baja", nom:4800, part:45, win:"MORENA", r:"🟡 Media / Cerrado", m:"Si"},
+            {s:5476, loc:"S. Teyahualco, Jajalpa, Villas de Loreto", ref:"Martha Narvaez, Ismael Fuentes", del:"N: Av. Toluca, S: Canal S. Juan", tipo:"Urbano", nse:"D+ / Media", nom:3400, part:49, win:"MORENA", r:"🟡 Media / Cohesión", m:"Si"},
+            {s:5478, loc:"U. Hab. San Pablo CTM", ref:"Armando Garnica, Alicia", del:"N: CECYTEM, S: Calle 6", tipo:"Urbano", nse:"D+ / Media", nom:3800, part:41, win:"MORENA", r:"🔴 Alta / Células pasillo", m:"Si"},
+            {s:5479, loc:"U. Hab. San Pablo CTM", ref:"Armando Garnica, Alicia", del:"(Polígono Interior CTM)", tipo:"Urbano", nse:"D+ / Media", nom:3100, part:39, win:"MORENA", r:"🔴 Alta / Foco abstención", m:"Si"},
+            {s:5480, loc:"U. Hab. San Pablo CTM", ref:"Armando Garnica, Alicia", del:"(Polígono Interior CTM)", tipo:"Urbano", nse:"D+ / Media", nom:2500, part:41, win:"MORENA", r:"🔴 Alta / Rotación", m:"Si"},
+            {s:5481, loc:"U. Hab. San Pablo CTM", ref:"Armando Garnica, Alicia", del:"(Polígono Interior CTM)", tipo:"Urbano", nse:"D / Alta", nom:4000, part:40, win:"MORENA", r:"🔴 Alta / Frontera", m:"Si"},
+            {s:6638, loc:"Barrio San Martín Calvario", ref:"Jesús Vargas, Paco Jivéz", del:"(Polígono Reseccionado de la 5466)", tipo:"Urbano", nse:"D+ / Media", nom:3200, part:45, win:"MORENA", r:"🟡 Media", m:"Si"},
+            {s:6639, loc:"U. Hab. San Pablo CTM", ref:"Armando Garnica, Alicia", del:"(Polígono Reseccionado Sur)", tipo:"Urbano", nse:"D+ / Media", nom:3400, part:43, win:"MORENA", r:"🔴 Alta / CTM Sur", m:"Si"},
+            {s:6683, loc:"Fracc. Paseos de Tultepec II", ref:"May Cabello", del:"(Nuevo Polígono Habitacional Oriente)", tipo:"Residenc.", nse:"C- / Baja", nom:3100, part:48, win:"COALICIÓN", r:"⚫ Riesgo / Competido", m:"No"},
+            {s:6684, loc:"La Antigua, Paseos de Tultepec II", ref:"May Cabello", del:"(Nuevo Polígono Habitacional Oriente)", tipo:"Residenc.", nse:"C- / Baja", nom:2900, part:48, win:"COALICIÓN", r:"⚫ Riesgo / Competido", m:"No"},
+            {s:6685, loc:"El Bosque Tultepec, El Dorado", ref:"Norma Nuñez", del:"(Nuevo Polígono Norte)", tipo:"Residenc.", nse:"C / Baja", nom:3500, part:51, win:"COALICIÓN", r:"⚫ Riesgo / Media-Alta", m:"No"},
+            {s:6686, loc:"Fracc. Hacienda del Jardín 2a Secc.", ref:"Claudia Orduz", del:"(Polígono Colindante Teyahualco)", tipo:"Residenc.", nse:"C- / Baja", nom:2700, part:49, win:"COALICIÓN", r:"⚫ Riesgo", m:"No"},
+            {s:6687, loc:"Fracc. El Bosque Tultepec", ref:"Norma Nuñez", del:"(Nuevo Polígono Norte)", tipo:"Residenc.", nse:"C / Baja", nom:2800, part:50, win:"COALICIÓN", r:"⚫ Riesgo", m:"No"},
+            {s:6688, loc:"Fracc. Hacienda del Jardín 1a Secc.", ref:"Claudia Orduz", del:"(Polígono Colindante Teyahualco)", tipo:"Residenc.", nse:"C- / Baja", nom:2600, part:49, win:"COALICIÓN", r:"⚫ Riesgo", m:"No"},
+            {s:6689, loc:"Fracc. Hacienda del Jardín 2a Secc.", ref:"Claudia Orduz", del:"(Polígono Colindante Teyahualco)", tipo:"Residenc.", nse:"C- / Baja", nom:2500, part:49, win:"COALICIÓN", r:"⚫ Riesgo", m:"No"},
+            {s:6930, loc:"Col. El Quemado, Rancho Santa Elena", ref:"Ma. Luisa, Teresa, Carlos Galicia", del:"N: Blvd. de la Joya", tipo:"Residenc.", nse:"C / Baja", nom:3900, part:50, win:"COALICIÓN", r:"⚫ Riesgo / Fuerte opo.", m:"Si"},
+            {s:6931, loc:"Fracc. Santa Elena", ref:"Teresa, Carlos Galicia", del:"(Polígono Norte Elena)", tipo:"Residenc.", nse:"C / Baja", nom:2800, part:49, win:"COALICIÓN", r:"⚫ Riesgo", m:"Si"},
+            {s:6932, loc:"Fracc. Santa Elena", ref:"Teresa, Carlos Galicia", del:"(Polígono Centro Elena)", tipo:"Residenc.", nse:"C / Baja", nom:2600, part:47, win:"COALICIÓN", r:"⚫ Riesgo", m:"Si"},
+            {s:6933, loc:"Col. El Quemado", ref:"Ma. Luisa", del:"(Polígono Sur)", tipo:"Urbano", nse:"D / Media", nom:2200, part:44, win:"MORENA", r:"🟡 Media / Intercalado", m:"Si"},
+            {s:6934, loc:"Fracc. Santa Elena", ref:"Teresa, Carlos Galicia", del:"(Polígono Oriente Elena)", tipo:"Residenc.", nse:"C / Baja", nom:2900, part:46, win:"COALICIÓN", r:"⚫ Riesgo", m:"Si"},
+            {s:6935, loc:"Fracc. Santa Elena", ref:"Teresa, Carlos Galicia", del:"(Polígono Sur Elena)", tipo:"Residenc.", nse:"C / Baja", nom:2500, part:45, win:"COALICIÓN", r:"⚫ Riesgo", m:"Si"},
+            {s:6936, loc:"Fracc. Santa Elena, Ángel de Luz", ref:"Teresa, Carlos Galicia", del:"(Polígono Surponiente)", tipo:"Residenc.", nse:"C / Baja", nom:4200, part:48, win:"COALICIÓN", r:"⚫ Riesgo / Plusvalía", m:"Si"},
+            {s:6937, loc:"Fracc. Hacienda Real de Tultepec", ref:"Martha Narvaez, Sandra Lule", del:"(Polígono Norte Hacienda)", tipo:"Residenc.", nse:"C- / Baja", nom:2400, part:51, win:"MORENA", r:"🟡 Media / Cerrado", m:"Si"},
+            {s:6938, loc:"Fracc. Hacienda Real de Tultepec", ref:"Martha Narvaez, Sandra Lule", del:"(Polígono Centro Hacienda)", tipo:"Residenc.", nse:"C- / Baja", nom:2600, part:50, win:"MORENA", r:"🟡 Media", m:"Si"},
+            {s:6939, loc:"Fracc. Hacienda Real de Tultepec", ref:"Martha Narvaez, Sandra Lule", del:"(Polígono Oriente Hacienda)", tipo:"Residenc.", nse:"C- / Baja", nom:2700, part:49, win:"MORENA", r:"🟡 Media", m:"Si"},
+            {s:6940, loc:"Fracc. Hacienda Real de Tultepec", ref:"Martha Narvaez, Sandra Lule", del:"(Polígono Sur Hacienda)", tipo:"Residenc.", nse:"C- / Baja", nom:2800, part:44, win:"MORENA", r:"🔴 Alta / Abstención", m:"Si"},
+            {s:6941, loc:"Fracc. Hacienda Real de Tultepec", ref:"Martha Narvaez, Sandra Lule", del:"(Polígono Extensión Hacienda)", tipo:"Residenc.", nse:"C- / Baja", nom:3100, part:50, win:"MORENA", r:"🟡 Media", m:"Si"}
+        ];
+
+        function renderTable(dataToRender) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+            
+            dataToRender.forEach(row => {
+                // Cálculo de votación sin errores de precisión (Redondeo a entero)
+                const votacionCalculada = Math.round(row.nom * (row.part / 100));
+                
+                // Lógica de círculo único
+                let dotClass = '';
+                if(row.r.includes('🔴')) dotClass = 'dot-red';
+                else if(row.r.includes('🟡')) dotClass = 'dot-yellow';
+                else if(row.r.includes('⚫')) dotClass = 'dot-black';
+
+                // Limpiar el texto para que no salgan emojis dobles si vienen en el string
+                const cleanText = row.r.replace(/[🔴🟡⚫]/g, '').trim();
+
+                const htmlRow = `
+                    <tr>
+                        <td style="text-align:center; font-weight:bold">${row.s}</td>
+                        <td title="${row.loc}">${row.loc}</td>
+                        <td>${row.ref}</td>
+                        <td title="${row.del}">${row.del}</td>
+                        <td style="text-align:center">${row.tipo}</td>
+                        <td style="text-align:center">${row.nse}</td>
+                        <td style="text-align:right">${row.nom.toLocaleString()}</td>
+                        <td style="text-align:center">${row.part}%</td>
+                        <td style="text-align:right; font-weight:bold; color:#b45309">${votacionCalculada.toLocaleString()}</td>
+                        <td style="text-align:center; font-weight:bold; color:${row.win === 'MORENA' ? '#991b1b' : '#1e40af'}">${row.win}</td>
+                        <td><span class="status-dot ${dotClass}"></span>${cleanText}</td>
+                        <td style="text-align:center">${row.m}</td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend', htmlRow);
+            });
+        }
+
+        function filterTable() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const filteredData = rawData.filter(item => 
+                item.s.toString().includes(input) || 
+                item.loc.toLowerCase().includes(input) ||
+                item.ref.toLowerCase().includes(input) ||
+                item.r.toLowerCase().includes(input)
+            );
+            renderTable(filteredData);
+        }
+
+        renderTable(rawData);
+    </script>
+</body>
+</html>
