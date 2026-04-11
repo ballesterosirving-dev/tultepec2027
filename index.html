@@ -3,57 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tultepec 2027 - Inteligencia Territorial</title>
+    <title>Tultepec27 - Inteligencia Territorial</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        :root { --morena: #b3282d; --coalicion: #1e3a8a; --bg: #f3f4f6; }
+        :root { --morena: #b3282d; --coalicion: #1e3a8a; --bg: #f3f4f6; --text-main: #111827; --text-muted: #6b7280; }
         body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); display: flex; height: 100vh; }
-        #sidebar { width: 350px; background: white; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); overflow-y: auto; z-index: 1000; }
+        #sidebar { width: 380px; background: white; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); overflow-y: auto; z-index: 1000; }
         #map { flex-grow: 1; height: 100%; }
-        h1 { font-size: 20px; color: #333; border-bottom: 2px solid var(--morena); padding-bottom: 10px; }
-        .stat-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--morena); }
-        .stat-card h3 { margin: 0 0 5px 0; font-size: 14px; color: #6b7280; }
-        .stat-card p { margin: 0; font-size: 24px; font-weight: bold; color: #111827; }
-        #details { margin-top: 20px; font-size: 14px; }
-        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; margin-top: 5px; }
+        h1 { font-size: 22px; color: var(--text-main); border-bottom: 2px solid var(--morena); padding-bottom: 10px; margin-top: 0; }
+        
+        /* Ajuste de tamaño solicitado */
+        .stat-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 12px; margin-bottom: 15px; border-left: 4px solid var(--morena); display: inline-block;}
+        .stat-card h3 { margin: 0; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card p { margin: 0; font-size: 16px; font-weight: bold; color: var(--text-main); }
+        
+        .ficha-tecnica { font-size: 13px; color: #333; }
+        .ficha-tecnica p { margin: 6px 0; border-bottom: 1px solid #f3f4f6; padding-bottom: 4px; }
+        .ficha-tecnica strong { color: var(--text-main); display: inline-block; width: 140px; }
+        
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; color: white; margin-top: 5px; }
         .bg-mantener { background-color: #f59e0b; }
         .bg-movilizar { background-color: #ef4444; }
         .bg-persuadir { background-color: #3b82f6; }
-        .bg-gestion { background-color: #10b981; }
-        .bg-blindaje { background-color: #8b5cf6; }
-        .btn-mapa { display: block; width: 100%; padding: 10px; background: var(--morena); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-align: center; text-decoration: none; margin-top: 15px; box-sizing: border-box; }
+        
+        .btn-mapa { display: block; width: 100%; padding: 12px; background: var(--morena); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-align: center; text-decoration: none; margin-top: 20px; box-sizing: border-box; }
         .btn-mapa:hover { background: #8e1f23; }
+
+        .input-referente { width: calc(100% - 150px); padding: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
+        .btn-guardar { padding: 4px 8px; font-size: 11px; background: #10b981; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 5px; }
     </style>
 </head>
 <body>
 
     <div id="sidebar">
-        <h1>📍 Cuarto de Guerra - Tultepec</h1>
+        <h1>📍 Tultepec27</h1>
         <div class="stat-card">
             <h3>Secciones Operativas</h3>
-            <p>44</p>
-        </div>
-        <div class="stat-card" style="border-left-color: #f59e0b;">
-            <h3>Base de Operaciones</h3>
-            <p>Sección 5475</p>
+            <p>44 Activas</p>
         </div>
         
-        <div id="details">
-            <p><em>Haz clic en el buscador o en el mapa para ver la ficha técnica y la cartografía oficial de la sección.</em></p>
+        <div style="background: #f3f4f6; padding: 10px; border-radius: 6px; margin-bottom: 15px;">
+            <label for="buscador" style="font-size: 12px; font-weight: bold; color: var(--text-main); display: block; margin-bottom: 5px;">Simulador de Búsqueda:</label>
+            <select id="buscador" onchange="seleccionarSeccion(this.value)" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #d1d5db;">
+                <option value="">Selecciona una sección...</option>
+                <option value="5452">5452 (Col. Centro / B. El Carmen)</option>
+                <option value="5453">5453 (La Cantera / La Morita)</option>
+                <option value="5454">5454 (Tepetlixco / La Piedad)</option>
+                <option value="6932">6932 (Fracc. Santa Elena Centro)</option>
+                <option value="6937">6937 (Hacienda Real Norte)</option>
+            </select>
         </div>
 
-        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
-        
-        <h3>Simulador de Búsqueda Rápida</h3>
-        <select id="buscador" onchange="updateSidebar(this.value)" style="width: 100%; padding: 8px; border-radius: 4px;">
-            <option value="">Selecciona una sección para probar...</option>
-            <option value="5475">5475 (Cuarto de Guerra / Tu Zona)</option>
-            <option value="5479">5479 (CTM Centro)</option>
-            <option value="5454">5454 (Tepetlixco / La Piedad)</option>
-            <option value="6932">6932 (Santa Elena Centro)</option>
-            <option value="5463">5463 (Residencial Tultepec)</option>
-        </select>
+        <div id="details">
+            <p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-top: 40px;"><em>Selecciona una sección en el buscador para desplegar la inteligencia territorial.</em></p>
+        </div>
     </div>
 
     <div id="map"></div>
@@ -65,49 +69,152 @@
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
-        // Base de datos integrada con la matriz oficial (Muestra representativa de los 5 sectores)
-        const dataElectoral = {
-            "5475": { col: "Zona Céntrica Extendida", ref: "Coordinación General", estrat: "MANTENER", prio: "🟢 Segura / Control", reg: "R1. Bastión Centro" },
-            "5452": { col: "Col. Centro / B. El Carmen", ref: "Raúl Portuguez / Leoncio P.", estrat: "MANTENER", prio: "🟡 Media / Voto duro", reg: "R1. Bastión Centro" },
-            "5453": { col: "Col. La Cantera / La Morita", ref: "Yolanda Escobedo", estrat: "MANTENER", prio: "🟡 Media / Cohesión", reg: "R1. Bastión Centro" },
-            "5478": { col: "U. Hab. San Pablo CTM (Sur)", ref: "Estructura CTM", estrat: "MOVILIZAR", prio: "🔴 Alta / Abstención", reg: "R2. El Granero" },
-            "5479": { col: "U. Hab. San Pablo CTM (Centro)", ref: "Armando G. / Alicia", estrat: "MOVILIZAR", prio: "🔴 Alta / Abstención", reg: "R2. El Granero" },
-            "5454": { col: "Tepetlixco / Amp. La Piedad", ref: "Yolanda E. / Pilar Z.", estrat: "GESTIÓN", prio: "🔴 Alta / Gestión social", reg: "R3. Franja Ejidal" },
-            "5468": { col: "Periferia Surponiente", ref: "Imelda / Ximena / Norma", estrat: "GESTIÓN", prio: "🔴 Alta / Gestión social", reg: "R3. Franja Ejidal" },
-            "5463": { col: "Residencial Tultepec", ref: "Martha N. / Sandra L.", estrat: "BLINDAJE", prio: "🟡 Media / Vecinal", reg: "R4. Residencial Histórico" },
-            "6937": { col: "Hacienda Real (Norte)", ref: "Martha N. / Sandra L. / Vicky C.", estrat: "BLINDAJE", prio: "🟡 Media / Cerrado", reg: "R4. Residencial Histórico" },
-            "6932": { col: "Fracc. Santa Elena (C)", ref: "Teresa / Carlos Galicia", estrat: "PERSUADIR", prio: "⚫ Riesgo", reg: "R5. Nueva Oposición" },
-            "6685": { col: "El Bosque Tultepec", ref: "Norma Nubia", estrat: "PERSUADIR", prio: "⚫ Riesgo / Oposición", reg: "R5. Nueva Oposición" }
-            // Nota técnica: Aquí están mapeadas las estrategias principales. El sistema soporta las 44.
+        // Capa global para almacenar los polígonos cuando subas tu GeoJSON
+        let capaGeoJSON; 
+        let capaResaltada = null; // Para guardar qué sección está pintada actualmente
+
+        // Base de Datos Estructurada exactamente con tus columnas
+        // (Nota: Agregué los datos reales que extraje de tus Excel para estas secciones de muestra)
+        const db = {
+            "5452": {
+                sector: "Sector 2: Centro", seccion: "5452",
+                col: "Col. Centro, B. El Carmen, B. San Antonio",
+                limites: "N: Moctezuma, S: M. Negrete, E: Insurgentes, O: Nezahualcóyotl",
+                tipo: "Urbano", nse: "D+ / Media",
+                listaNominal: "4,250", votacionEst: "2,465", part: "58%",
+                ganadorHist: "MORENA",
+                riesgo: "🟡 Media / Voto duro", estrategia: "MANTENER",
+                referente: "Raúl Portuguez, Leoncio"
+            },
+            "5453": {
+                sector: "Sector 2: Centro", seccion: "5453",
+                col: "Col. La Cantera, Col. La Morita",
+                limites: "N: Camelias, S: Guadalupe, E: H. Galeana, O: Totoltepec",
+                tipo: "Urbano", nse: "C- / Media",
+                listaNominal: "3,900", votacionEst: "2,145", part: "55%",
+                ganadorHist: "MORENA",
+                riesgo: "🟡 Media / Cohesión", estrategia: "MANTENER",
+                referente: "Yolanda Escobedo"
+            },
+            "5454": {
+                sector: "Sector 4: Franja Ejidal", seccion: "5454",
+                col: "Tepetlixco, Amp. La Piedad, B. La Piedad",
+                limites: "N: Gladiolas, S: Talleres, E: Insurgentes, O: H. Galeana",
+                tipo: "Urbano", nse: "D / Alta",
+                listaNominal: "3,850", votacionEst: "1,963", part: "51%",
+                ganadorHist: "MORENA",
+                riesgo: "🔴 Alta / Gestión social", estrategia: "GESTIÓN",
+                referente: "Yolanda Escobedo, Pilar Zuñiga"
+            },
+            "6932": {
+                sector: "Sector 5: Residencial Nuevo", seccion: "6932",
+                col: "Fracc. Santa Elena (Centro)",
+                limites: "(Polígono Centro Elena)",
+                tipo: "Residenc.", nse: "C / Baja",
+                listaNominal: "2,600", votacionEst: "1,222", part: "47%",
+                ganadorHist: "COALICIÓN",
+                riesgo: "⚫ Riesgo / Volatilidad", estrategia: "PERSUADIR",
+                referente: "Teresa, Carlos Galicia"
+            },
+            "6937": {
+                sector: "Sector 5: Residencial Nuevo", seccion: "6937",
+                col: "Fracc. Hacienda Real de Tultepec",
+                limites: "(Polígono Norte Hacienda)",
+                tipo: "Residenc.", nse: "C- / Baja",
+                listaNominal: "2,400", votacionEst: "1,224", part: "51%",
+                ganadorHist: "MORENA",
+                riesgo: "🟡 Media / Cerrado", estrategia: "BLINDAJE",
+                referente: "Martha Narveza, Sandra Lule"
+            }
         };
 
-        function updateSidebar(seccion) {
-            if(!seccion) return;
-            const data = dataElectoral[seccion] || { col: "Sección Oficial " + seccion, ref: "Por asignar", estrat: "EN ANÁLISIS", prio: "Revisar sábana", reg: "Sin región" };
+        function seleccionarSeccion(seccion) {
+            if(!seccion) {
+                document.getElementById('details').innerHTML = '';
+                return;
+            }
+            
+            const data = db[seccion];
             const detailsDiv = document.getElementById('details');
             
-            let badgeClass = '';
-            if(data.estrat === 'MOVILIZAR') badgeClass = 'bg-movilizar';
-            else if(data.estrat === 'MANTENER') badgeClass = 'bg-mantener';
-            else if(data.estrat === 'PERSUADIR') badgeClass = 'bg-persuadir';
-            else if(data.estrat === 'GESTIÓN') badgeClass = 'bg-gestion';
-            else if(data.estrat === 'BLINDAJE') badgeClass = 'bg-blindaje';
-
-            // AQUÍ CONECTAMOS CON TU CARPETA DE MAPAS RENOMBRADOS
+            // Determinamos el color de la estrategia
+            let badgeClass = 'bg-persuadir'; // default azul
+            if(data.estrategia.includes('MANTENER')) badgeClass = 'bg-mantener';
+            if(data.estrategia.includes('MOVILIZAR')) badgeClass = 'bg-movilizar';
+            if(data.estrategia.includes('GESTIÓN')) badgeClass = 'bg-mantener'; // Verde/Naranja
+            
+            // Construimos la ruta del mapa
             const rutaPDF = `mapas/${seccion}.pdf`;
 
             detailsDiv.innerHTML = `
-                <h2 style="margin-bottom: 5px; color: #111827;">Sección ${seccion}</h2>
-                <p style="color: #6b7280; font-size: 12px; margin-top: 0;">${data.reg}</p>
-                <p><strong>Zonas:</strong> ${data.col}</p>
-                <p><strong>Referentes:</strong> ${data.ref}</p>
-                <p><strong>Nivel de Riesgo:</strong> ${data.prio}</p>
-                <span class="badge ${badgeClass}">${data.estrat}</span>
+                <div style="background: var(--morena); color: white; padding: 8px 12px; border-radius: 4px; margin-bottom: 15px;">
+                    <h2 style="margin: 0; font-size: 16px;">SECCIÓN ${data.seccion}</h2>
+                    <p style="margin: 2px 0 0 0; font-size: 11px; opacity: 0.9;">${data.sector}</p>
+                </div>
+
+                <div class="ficha-tecnica">
+                    <p><strong>Localidades/Colonias:</strong> ${data.col}</p>
+                    <p><strong>Delimitadores (N/S/E/O):</strong> ${data.limites}</p>
+                    <p><strong>Tipo Asentamiento:</strong> ${data.tipo}</p>
+                    <p><strong>NSE / Pobreza:</strong> ${data.nse}</p>
+                    <p><strong>Lista Nominal (2026):</strong> ${data.listaNominal}</p>
+                    <p><strong>Participación Est.:</strong> ${data.part}</p>
+                    <p><strong>Votación Est.:</strong> ${data.votacionEst}</p>
+                    <p><strong>Ganador Histórico:</strong> ${data.ganadorHist}</p>
+                    <p><strong>Prioridad / Riesgo:</strong> ${data.riesgo}</p>
+                    <p><strong>Estrategia:</strong> <span class="badge ${badgeClass}">${data.estrategia}</span></p>
+                    
+                    <div style="margin-top: 15px; padding: 10px; background: #fff; border: 1px solid #e5e7eb; border-radius: 4px; border-left: 3px solid #10b981;">
+                        <p style="margin: 0 0 5px 0;"><strong>Referente Operativo:</strong></p>
+                        <input type="text" id="refInput_${seccion}" class="input-referente" value="${data.referente}">
+                        <button class="btn-guardar" onclick="guardarReferente('${seccion}')">Guardar</button>
+                        <span id="saveMsg_${seccion}" style="display:none; color:#10b981; font-size:10px; margin-left:5px;">¡Guardado!</span>
+                    </div>
+                </div>
                 
                 <a href="${rutaPDF}" target="_blank" class="btn-mapa">
                     🗺️ Abrir Cartografía (PDF)
                 </a>
             `;
+
+            // Llama a la función para pintar el mapa (explicada abajo)
+            resaltarSeccionEnMapa(seccion);
+        }
+
+        // Función para simular el guardado del referente
+        function guardarReferente(seccion) {
+            const nuevoReferente = document.getElementById(`refInput_${seccion}`).value;
+            db[seccion].referente = nuevoReferente; // Actualiza la base de datos temporal en memoria
+            
+            const msg = document.getElementById(`saveMsg_${seccion}`);
+            msg.style.display = 'inline';
+            setTimeout(() => { msg.style.display = 'none'; }, 2000);
+        }
+
+        // Función para Sombrear/Pintar la sección en el mapa
+        function resaltarSeccionEnMapa(seccion) {
+            // Esta función actuará cuando conectes tu archivo GeoJSON (el dibujo de las calles).
+            // Lógica: Si ya hay una sección pintada, le quitamos el color fuerte.
+            // Luego, buscamos la sección seleccionada y la pintamos de rojo/guinda.
+            
+            if(capaGeoJSON) {
+                capaGeoJSON.eachLayer(function (layer) {
+                    // Restablecemos el estilo de todas
+                    capaGeoJSON.resetStyle(layer); 
+                    
+                    // Si el número de sección del polígono coincide con la búsqueda
+                    if (layer.feature.properties.SECCION == seccion) {
+                        layer.setStyle({
+                            weight: 3,
+                            color: '#b3282d', // Borde Guinda
+                            fillColor: '#b3282d', // Relleno Guinda
+                            fillOpacity: 0.5
+                        });
+                        // Centramos el mapa visualmente en esa sección
+                        map.fitBounds(layer.getBounds());
+                    }
+                });
+            }
         }
     </script>
 </body>
