@@ -2,219 +2,232 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Tultepec27 - Inteligencia Territorial</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root { --morena: #b3282d; --coalicion: #1e3a8a; --bg: #f3f4f6; --text-main: #111827; --text-muted: #6b7280; }
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); display: flex; height: 100vh; }
-        #sidebar { width: 380px; background: white; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); overflow-y: auto; z-index: 1000; }
-        #map { flex-grow: 1; height: 100%; }
-        h1 { font-size: 22px; color: var(--text-main); border-bottom: 2px solid var(--morena); padding-bottom: 10px; margin-top: 0; }
+        body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         
-        /* Ajuste de tamaño solicitado */
-        .stat-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 12px; margin-bottom: 15px; border-left: 4px solid var(--morena); display: inline-block;}
-        .stat-card h3 { margin: 0; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-card p { margin: 0; font-size: 16px; font-weight: bold; color: var(--text-main); }
+        #sidebar { width: 400px; background: white; padding: 20px; box-shadow: 4px 0 10px rgba(0,0,0,0.05); overflow-y: auto; z-index: 1000; display: flex; flex-direction: column; transition: all 0.3s ease; }
+        #map { flex-grow: 1; height: 100%; position: relative; z-index: 1; }
         
-        .ficha-tecnica { font-size: 13px; color: #333; }
-        .ficha-tecnica p { margin: 6px 0; border-bottom: 1px solid #f3f4f6; padding-bottom: 4px; }
-        .ficha-tecnica strong { color: var(--text-main); display: inline-block; width: 140px; }
+        h1 { font-size: 22px; color: var(--text-main); border-bottom: 3px solid var(--morena); padding-bottom: 12px; margin-top: 0; display: flex; justify-content: space-between; align-items: center; }
+        .stat-badge { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: bold; color: var(--morena); }
         
-        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; color: white; margin-top: 5px; }
+        /* CORRECCIÓN: Estructura limpia para textos largos */
+        .ficha-tecnica { font-size: 14px; color: #333; }
+        .ficha-tecnica p { margin: 12px 0; border-bottom: 1px solid #f3f4f6; padding-bottom: 8px; line-height: 1.6; word-break: break-word; }
+        .ficha-tecnica strong { color: var(--text-main); display: block; margin-bottom: 4px; font-size: 10px; text-transform: uppercase; color: #6b7280; letter-spacing: 0.5px;}
+        
+        .badge { display: inline-block; padding: 5px 10px; border-radius: 4px; font-size: 10px; font-weight: bold; color: white; margin-top: 5px; text-align: center;}
         .bg-mantener { background-color: #f59e0b; }
         .bg-movilizar { background-color: #ef4444; }
         .bg-persuadir { background-color: #3b82f6; }
+        .bg-gestion { background-color: #10b981; }
+        .bg-blindaje { background-color: #8b5cf6; }
         
-        .btn-mapa { display: block; width: 100%; padding: 12px; background: var(--morena); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-align: center; text-decoration: none; margin-top: 20px; box-sizing: border-box; }
+        .btn-mapa { display: block; width: 100%; padding: 15px; background: var(--morena); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-align: center; text-decoration: none; margin-top: 20px; font-size: 14px; box-shadow: 0 4px 6px rgba(179,40,45,0.2); }
         .btn-mapa:hover { background: #8e1f23; }
 
-        .input-referente { width: calc(100% - 150px); padding: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
-        .btn-guardar { padding: 4px 8px; font-size: 11px; background: #10b981; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 5px; }
+        .referente-box { margin-top: 20px; padding: 15px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; border-left: 5px solid #10b981; }
+        .input-referente { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; margin-top: 8px; box-sizing: border-box;}
+        .btn-guardar { width: 100%; padding: 10px; margin-top: 10px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+        .pulsing-marker { animation: pulse 1.2s infinite alternate; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.6); opacity: 1; } }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            #sidebar { width: 100%; height: 60vh; order: 2; border-radius: 20px 20px 0 0; margin-top: -25px; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); }
+            #map { width: 100%; height: 40vh; order: 1; }
+            h1 { font-size: 18px; }
+        }
     </style>
 </head>
 <body>
-
     <div id="sidebar">
-        <h1>📍 Tultepec27</h1>
-        <div class="stat-card">
-            <h3>Secciones Operativas</h3>
-            <p>44 Activas</p>
-        </div>
+        <h1>📍 Tultepec27 <span class="stat-badge">44 Secciones</span></h1>
         
-        <div style="background: #f3f4f6; padding: 10px; border-radius: 6px; margin-bottom: 15px;">
-            <label for="buscador" style="font-size: 12px; font-weight: bold; color: var(--text-main); display: block; margin-bottom: 5px;">Simulador de Búsqueda:</label>
-            <select id="buscador" onchange="seleccionarSeccion(this.value)" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #d1d5db;">
-                <option value="">Selecciona una sección...</option>
-                <option value="5452">5452 (Col. Centro / B. El Carmen)</option>
-                <option value="5453">5453 (La Cantera / La Morita)</option>
-                <option value="5454">5454 (Tepetlixco / La Piedad)</option>
-                <option value="6932">6932 (Fracc. Santa Elena Centro)</option>
-                <option value="6937">6937 (Hacienda Real Norte)</option>
+        <div style="background: #f3f4f6; padding: 12px; border-radius: 10px; margin-bottom: 15px;">
+            <select id="buscador" onchange="seleccionarSeccion(this.value)" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 15px; background: white;">
+                <option value="">🔍 Seleccionar Sección...</option>
+                <optgroup label="Sector 1: Norponiente (Expansión y Retos Urbanos)">
+                    <option value="5454">5454 (Tepetlixco, Amp. La Piedad, B...)</option>
+                    <option value="5456">5456 (La Palma, Amado Nervo, Lomas d..)</option>
+                    <option value="5457">5457 (Vicente Suárez, Lomas, S.A. Xa..)</option>
+                    <option value="5458">5458 (Col. Las Brisas)</option>
+                    <option value="5466">5466 (San Martín Calvario, San Juan ..)</option>
+                    <option value="5467">5467 (Barrio San Juan Xocotla)</option>
+                    <option value="6638">6638 (Barrio San Martín Calvario)</option>
+                </optgroup>
+                <optgroup label="Sector 2: Centro (Núcleo Tradicional y Comercial)">
+                    <option value="5452">5452 (Col. Centro, B. El Carmen, B. ..)</option>
+                    <option value="5453">5453 (Col. La Cantera, Col. La Morit..)</option>
+                    <option value="5455">5455 (El Mirador, Col. México, B. Gp..)</option>
+                    <option value="5459">5459 (B. Gpe. Tlazintla, B. San Rafa..)</option>
+                    <option value="5460">5460 (La Morita, Sta. Isabel, El Car..)</option>
+                    <option value="5461">5461 (Col. La Cantera)</option>
+                    <option value="5462">5462 (San Miguel Otlica, San Juan Xo..)</option>
+                    <option value="5463">5463 (Residencial Tultepec)</option>
+                    <option value="5464">5464 (Barrio San Rafael)</option>
+                    <option value="6933">6933 (Col. El Quemado)</option>
+                </optgroup>
+                <optgroup label="Sector 3: Surponiente (Ejidal y Alta Densidad)">
+                    <option value="5468">5468 (Emiquia, Jardines Sta. Cruz, L..)</option>
+                    <option value="5473">5473 (Pblo. S. Teyahualco, S. Pablit..)</option>
+                    <option value="5476">5476 (S. Teyahualco, Jajalpa, Villas..)</option>
+                </optgroup>
+                <optgroup label="Sector 4: Oriente CTM (Habitacional Vertical)">
+                    <option value="5474">5474 (Fracc. Hacienda Real, Arcos Tu..)</option>
+                    <option value="5478">5478 (U. Hab. San Pablo CTM)</option>
+                    <option value="5479">5479 (U. Hab. San Pablo CTM)</option>
+                    <option value="5480">5480 (U. Hab. San Pablo CTM)</option>
+                    <option value="5481">5481 (U. Hab. San Pablo CTM)</option>
+                    <option value="6639">6639 (U. Hab. San Pablo CTM (Sur))</option>
+                </optgroup>
+                <optgroup label="Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)">
+                    <option value="6683">6683 (Fracc. Paseos de Tultepec II)</option>
+                    <option value="6684">6684 (La Antigua, Paseos de Tultepec..)</option>
+                    <option value="6685">6685 (El Bosque Tultepec, El Dorado)</option>
+                    <option value="6686">6686 (Fracc. Hacienda del Jardín 2a ..)</option>
+                    <option value="6687">6687 (Fracc. El Bosque Tultepec)</option>
+                    <option value="6688">6688 (Fracc. Hacienda del Jardín 1a ..)</option>
+                    <option value="6689">6689 (Fracc. Hacienda del Jardín 2a ..)</option>
+                    <option value="6930">6930 (Col. El Quemado, Rancho Santa ..)</option>
+                    <option value="6931">6931 (Fracc. Santa Elena (N))</option>
+                    <option value="6932">6932 (Fracc. Santa Elena (C))</option>
+                    <option value="6934">6934 (Fracc. Santa Elena (Ote))</option>
+                    <option value="6935">6935 (Fracc. Santa Elena (S))</option>
+                    <option value="6936">6936 (Fracc. Santa Elena, Ángel de L..)</option>
+                    <option value="6937">6937 (Fracc. Hacienda Real de Tultep..)</option>
+                    <option value="6938">6938 (Fracc. Hacienda Real de Tultep..)</option>
+                    <option value="6939">6939 (Fracc. Hacienda Real de Tultep..)</option>
+                    <option value="6940">6940 (Fracc. Hacienda Real de Tultep..)</option>
+                    <option value="6941">6941 (Fracc. Hacienda Real de Tultep..)</option>
+                </optgroup>
             </select>
         </div>
-
-        <div id="details">
-            <p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-top: 40px;"><em>Selecciona una sección en el buscador para desplegar la inteligencia territorial.</em></p>
-        </div>
+        <div id="details"><p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-top: 40px;"><em>Selecciona una sección para desplegar la inteligencia territorial completa.</em></p></div>
     </div>
-
     <div id="map"></div>
 
     <script>
-        const map = L.map('map').setView([19.6842, -99.1286], 14);
+        const map = L.map('map', { zoomControl: false }).setView([19.6842, -99.1286], 13);
+        L.control.zoom({ position: 'topright' }).addTo(map);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+        let capaMarcadores = L.featureGroup().addTo(map);
+        let marcadoresOriginales = {};
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
-
-        // Capa global para almacenar los polígonos cuando subas tu GeoJSON
-        let capaGeoJSON; 
-        let capaResaltada = null; // Para guardar qué sección está pintada actualmente
-
-        // Base de Datos Estructurada exactamente con tus columnas
-        // (Nota: Agregué los datos reales que extraje de tus Excel para estas secciones de muestra)
+        // BASE DE DATOS FINAL - PROCESADA DE REG_27.XLSX (44 SECCIONES)
         const db = {
-            "5452": {
-                sector: "Sector 2: Centro", seccion: "5452",
-                col: "Col. Centro, B. El Carmen, B. San Antonio",
-                limites: "N: Moctezuma, S: M. Negrete, E: Insurgentes, O: Nezahualcóyotl",
-                tipo: "Urbano", nse: "D+ / Media",
-                listaNominal: "4,250", votacionEst: "2,465", part: "58%",
-                ganadorHist: "MORENA",
-                riesgo: "🟡 Media / Voto duro", estrategia: "MANTENER",
-                referente: "Raúl Portuguez, Leoncio"
-            },
-            "5453": {
-                sector: "Sector 2: Centro", seccion: "5453",
-                col: "Col. La Cantera, Col. La Morita",
-                limites: "N: Camelias, S: Guadalupe, E: H. Galeana, O: Totoltepec",
-                tipo: "Urbano", nse: "C- / Media",
-                listaNominal: "3,900", votacionEst: "2,145", part: "55%",
-                ganadorHist: "MORENA",
-                riesgo: "🟡 Media / Cohesión", estrategia: "MANTENER",
-                referente: "Yolanda Escobedo"
-            },
-            "5454": {
-                sector: "Sector 4: Franja Ejidal", seccion: "5454",
-                col: "Tepetlixco, Amp. La Piedad, B. La Piedad",
-                limites: "N: Gladiolas, S: Talleres, E: Insurgentes, O: H. Galeana",
-                tipo: "Urbano", nse: "D / Alta",
-                listaNominal: "3,850", votacionEst: "1,963", part: "51%",
-                ganadorHist: "MORENA",
-                riesgo: "🔴 Alta / Gestión social", estrategia: "GESTIÓN",
-                referente: "Yolanda Escobedo, Pilar Zuñiga"
-            },
-            "6932": {
-                sector: "Sector 5: Residencial Nuevo", seccion: "6932",
-                col: "Fracc. Santa Elena (Centro)",
-                limites: "(Polígono Centro Elena)",
-                tipo: "Residenc.", nse: "C / Baja",
-                listaNominal: "2,600", votacionEst: "1,222", part: "47%",
-                ganadorHist: "COALICIÓN",
-                riesgo: "⚫ Riesgo / Volatilidad", estrategia: "PERSUADIR",
-                referente: "Teresa, Carlos Galicia"
-            },
-            "6937": {
-                sector: "Sector 5: Residencial Nuevo", seccion: "6937",
-                col: "Fracc. Hacienda Real de Tultepec",
-                limites: "(Polígono Norte Hacienda)",
-                tipo: "Residenc.", nse: "C- / Baja",
-                listaNominal: "2,400", votacionEst: "1,224", part: "51%",
-                ganadorHist: "MORENA",
-                riesgo: "🟡 Media / Cerrado", estrategia: "BLINDAJE",
-                referente: "Martha Narveza, Sandra Lule"
-            }
-        };
+    "5454": { sector: `Sector 1: Norponiente (Expansión y Retos Urbanos)`, col: `Tepetlixco, Amp. La Piedad, B. La Piedad`, limites: `N: Gladiolas, S: Talleres, E: Insurgentes, O: H. Galeana`, nse: `D / Alta`, nominal: `3850`, votacion: `1963`, part: `0.51`, ganador: `MORENA`, riesgo: `🔴 Alta / Requiere gestión`, estrategia: `MOVILIZAR (Combate Abstencionismo)`, referente: `Yolanda Escobedo, Pilar Zuñiga`, lat: 19.701, lng: -99.141 },
+    "5456": { sector: `Sector 1: Norponiente (Expansión y Retos Urbanos)`, col: `La Palma, Amado Nervo, Lomas de Tultepec`, limites: `N: Blvd. Totoltepec, S: San Antonio, E: Centenario, O: Xicoténcatl`, nse: `C / Media`, nominal: `3200`, votacion: `1664`, part: `0.52`, ganador: `MORENA`, riesgo: `🔴 Alta / Gremio cohetero`, estrategia: `MOVILIZAR (Combate Abstencionismo)`, referente: `Aide, Graciela`, lat: 19.7025, lng: -99.1425 },
+    "5457": { sector: `Sector 1: Norponiente (Expansión y Retos Urbanos)`, col: `Vicente Suárez, Lomas, S.A. Xahuento`, limites: `N: Blvd. Totoltepec, S: 11 Tlalmelaca, E: Pavorreales, O: Centenario`, nse: `D+ / Media`, nominal: `2800`, votacion: `1624`, part: `0.58`, ganador: `MORENA`, riesgo: `🟡 Media / Crecimiento`, estrategia: `MANTENER (Voto Duro)`, referente: `Carmen, Aide, Fernando Romero, Gema Oviedo`, lat: 19.7035, lng: -99.141 },
+    "5458": { sector: `Sector 1: Norponiente (Expansión y Retos Urbanos)`, col: `Col. Las Brisas`, limites: `N: Av. San Pablo, S: Guardarraya, E: La Saucera, O: Chimalpopoca`, nse: `D / Alta`, nominal: `3500`, votacion: `1715`, part: `0.49`, ganador: `MORENA`, riesgo: `🔴 Alta / Rezago urbano`, estrategia: `MOVILIZAR (Combate Abstencionismo)`, referente: `Aide, Graciela`, lat: 19.705, lng: -99.1395 },
+    "5466": { sector: `Sector 1: Norponiente (Expansión y Retos Urbanos)`, col: `San Martín Calvario, San Juan Xocotla`, limites: `N: V. Carranza, S: Libramiento 2, E: Tamaulipas, O: 16 de Septiembre`, nse: `D+ / Media`, nominal: `4400`, votacion: `2112`, part: `0.48`, ganador: `MORENA`, riesgo: `🔴 Alta / Caída de part.`, estrategia: `MOVILIZAR (Combate Abstencionismo)`, referente: `Jesús Vargas, Paco Zovic, Daniel Cruz`, lat: 19.704, lng: -99.144 },
+    "5467": { sector: `Sector 1: Norponiente (Expansión y Retos Urbanos)`, col: `Barrio San Juan Xocotla`, limites: `N: Matamoros, S: 16 de Septiembre, E: Ecuador, O: Totoltepec`, nse: `D / Alta`, nominal: `4500`, votacion: `2070`, part: `0.46`, ganador: `MORENA`, riesgo: `🔴 Alta / Zonas vulnerables`, estrategia: `MOVILIZAR (Combate Abstencionismo)`, referente: `Daniel Cruz`, lat: 19.7055, lng: -99.1365 },
+    "6638": { sector: `Sector 1: Norponiente (Expansión y Retos Urbanos)`, col: `Barrio San Martín Calvario`, limites: `(Polígono Reseccionado de la 5466)`, nse: `D+ / Media`, nominal: `3200`, votacion: `1440`, part: `0.45`, ganador: `MORENA`, riesgo: `🟡 Media / Sensible a seguridad`, estrategia: `MANTENER (Voto Duro)`, referente: `Jesús Vargas, Paco Zovic`, lat: 19.702, lng: -99.138 },
+    "5452": { sector: `Sector 2: Centro (Núcleo Tradicional y Comercial)`, col: `Col. Centro, B. El Carmen, B. San Antonio`, limites: `N: Moctezuma, S: M. Negrete, E: Insurgentes, O: Nezahualcóyotl`, nse: `D+ / Media`, nominal: `4250`, votacion: `2465`, part: `0.58`, ganador: `MORENA`, riesgo: `🟡 Media / Voto duro`, estrategia: `MANTENER (Voto Duro)`, referente: `Raúl Portuguez, Leoncio Pirotecnico`, lat: 19.684, lng: -99.128 },
+    "5453": { sector: `Sector 2: Centro (Núcleo Tradicional y Comercial)`, col: `Col. La Cantera, Col. La Morita`, limites: `N: Camelias, S: Guadalupe, E: H. Galeana, O: Totoltepec`, nse: `C- / Media`, nominal: `3900`, votacion: `2145`, part: `0.55`, ganador: `MORENA`, riesgo: `🟡 Media / Fuerte cohesión`, estrategia: `MANTENER (Voto Duro)`, referente: `Yolanda Escobedo`, lat: 19.6855, lng: -99.125 },
+    "5455": { sector: `Sector 2: Centro (Núcleo Tradicional y Comercial)`, col: `El Mirador, Col. México, B. Gpe. Tlazintla`, limites: `N: Sta. Cruz, S: Cuauhtémoc, E: F. Sarabia, O: Insurgentes`, nse: `D+ / Media`, nominal: `3700`, votacion: `2072`, part: `0.56`, ganador: `MORENA`, riesgo: `🟡 Media / Base tradicional`, estrategia: `MANTENER (Voto Duro)`, referente: `Gema Oviedo`, lat: 19.684, lng: -99.128 },
+    "5459": { sector: `Sector 2: Centro (Núcleo Tradicional y Comercial)`, col: `B. Gpe. Tlazintla, B. San Rafael`, limites: `N: Cuauhtémoc, S: J.M. Morelos, E: Los Deportes, O: Insurgentes`, nse: `C- / Media`, nominal: `4100`, votacion: `2337`, part: `0.57`, ganador: `MORENA`, riesgo: `🟡 Media / Blindaje`, estrategia: `MANTENER (Voto Duro)`, referente: `Gema Oviedo`, lat: 19.684, lng: -99.128 },
+    "5460": { sector: `Sector 2: Centro (Núcleo Tradicional y Comercial)`, col: `La Morita, Sta. Isabel, El Carmen, S. Antonio`, limites: `N: Talleres, S: Moctezuma, E: Insurgentes, O: Buenavista`, nse: `C- / Media`, nominal: `4300`, votacion: `2408`, part: `0.56`, ganador: `MORENA`, riesgo: `🟡 Media / Zona comercial`, estrategia: `MANTENER (Voto Duro)`, referente: `Leoncio Pirotecnico, Raúl Portuguez`, lat: 19.684, lng: -99.128 },
+    "5461": { sector: `Sector 2: Centro (Núcleo Tradicional y Comercial)`, col: `Col. La Cantera`, limites: `N: Gpe. / Barranca, S: Camino Viejo, E: Buenavista, O: Gpe. (Calzada)`, nse: `D+ / Media`, nominal: `4500`, votacion: `2385`, part: `0.53`, ganador: `MORENA`, riesgo: `🟡 Media / Competitivo`, estrategia: `MANTENER (Voto Duro)`, referente: `Yolanda Escobedo`, lat: 19.684, lng: -99.128 },
+    "5462": { sector: `Sector 2: Centro (Núcleo Tradicional y Comercial)`, col: `San Miguel Otlica, San Juan Xocotla`, limites: `N: Camino Viejo, S: Matamoros, E: Ecuador, O: Totoltepec`, nse: `C- / Media`, nominal: `4800`, votacion: `2400`, part: `0.5`, ganador: `MORENA`, riesgo: `🟡 Media / Voto masivo`, estrategia: `MANTENER (Voto Duro)`, referente: `Gerardo Ramírez, Daniel Cruz, Gema Oviedo`, lat: 19.684, lng: -99.128 },
+    "5463": { sector: `Sector 2: Centro (Núcleo Tradicional y Comercial)`, col: `Residencial Tultepec`, limites: `N: Nicolás Bravo, S: V. Carranza, E: B. Juárez, O: Ecuador`, nse: `C / Media`, nominal: `4600`, votacion: `2484`, part: `0.54`, ganador: `MORENA`, riesgo: `🟡 Media / Operación vecinal`, estrategia: `MANTENER (Voto Duro)`, referente: `Martha Narveza, Sandra Lule, Vicky Contreras`, lat: 19.684, lng: -99.128 },
+    "5464": { sector: `Sector 2: Centro (Núcleo Tradicional y Comercial)`, col: `Barrio San Rafael`, limites: `N: J.M. Morelos, S: Miguel Negrete, E: Los Deportes, O: I. Zaragoza`, nse: `C- / Media`, nominal: `3900`, votacion: `2028`, part: `0.52`, ganador: `MORENA`, riesgo: `🟡 Media / Límite de control`, estrategia: `MANTENER (Voto Duro)`, referente: `nan`, lat: 19.684, lng: -99.128 },
+    "6933": { sector: `Sector 2: Centro (Núcleo Tradicional y Comercial)`, col: `Col. El Quemado`, limites: `(Polígono Sur)`, nse: `D / Media`, nominal: `2200`, votacion: `968`, part: `0.44`, ganador: `MORENA`, riesgo: `🟡 Media / Intercalado con fraccs.`, estrategia: `MANTENER (Voto Duro)`, referente: `Ma. Luisa`, lat: 19.684, lng: -99.128 },
+    "5475": { sector: `Sector 2: Centro (Núcleo Tradicional y Comercial)`, col: `Céntrica Extendida`, limites: `Centro`, nse: `C- / Media`, nominal: `3000`, votacion: `1650`, part: `0.55`, ganador: `MORENA`, riesgo: `🟢 Segura / Control`, estrategia: `MANTENER (Voto Duro)`, referente: `Coordinación General`, lat: 19.684, lng: -99.128 },
+    "5465": { sector: `Sector 2: Centro (Núcleo Tradicional y Comercial)`, col: `Barrio Guadalupe`, limites: `Centro`, nse: `D+ / Media`, nominal: `2150`, votacion: `1182.5`, part: `0.55`, ganador: `MORENA`, riesgo: `🟡 Media / Voto duro`, estrategia: `MANTENER (Voto Duro)`, referente: `nan`, lat: 19.684, lng: -99.128 },
+    "5468": { sector: `Sector 3: Surponiente (Ejidal y Alta Densidad)`, col: `Emiquia, Jardines Sta. Cruz, La Cañada`, limites: `N: Blvd. Totoltepec, S: Camelias / Gladiolas, E: Insurgentes, O: Camino Viejo`, nse: `D / Alta`, nominal: `5100`, votacion: `2295`, part: `0.45`, ganador: `MORENA`, riesgo: `🔴 Alta / Volumen vs Abstención`, estrategia: `MOVILIZAR (Combate Abstencionismo)`, referente: `Imelda, Ximena, Norma, Luisa, Angeles, Alicia`, lat: 19.665, lng: -99.125 },
+    "5473": { sector: `Sector 3: Surponiente (Ejidal y Alta Densidad)`, col: `Pblo. S. Teyahualco, S. Pablito, Paseos II`, limites: `N: Av. Toluca, S: C. Morelos, E: Amado Nervo, O: J. del Pedregal`, nse: `D+ / Alta`, nominal: `5000`, votacion: `2200`, part: `0.44`, ganador: `MORENA`, riesgo: `🔴 Alta / Alta densidad`, estrategia: `MOVILIZAR (Combate Abstencionismo)`, referente: `Ismael Fuentes, Lili`, lat: 19.6665, lng: -99.1265 },
+    "5476": { sector: `Sector 3: Surponiente (Ejidal y Alta Densidad)`, col: `S. Teyahualco, Jajalpa, Villas de Loreto`, limites: `N: Av. Toluca, S: Canal S. Juan, E: Amado Nervo, O: R. Flores Magón`, nse: `D+ / Media`, nominal: `3400`, votacion: `1666`, part: `0.49`, ganador: `MORENA`, riesgo: `🟡 Media / Cohesión comunitaria`, estrategia: `MANTENER (Voto Duro)`, referente: `Martha Narveza, Ismael Fuentes, Lili`, lat: 19.668, lng: -99.128 },
+    "5474": { sector: `Sector 4: Oriente CTM (Habitacional Vertical)`, col: `Fracc. Hacienda Real, Arcos Tultepec`, limites: `N: Acueducto Río Hondo, S: Av. Hda. Las Rosas, E: Av. Las Rosas, O: Cto. Alcatraz`, nse: `C / Baja`, nominal: `4800`, votacion: `2160`, part: `0.45`, ganador: `MORENA`, riesgo: `🟡 Media / Fracc. cerrado`, estrategia: `MANTENER (Voto Duro)`, referente: `Lizbeth Luna, Gabriela Blake`, lat: 19.67, lng: -99.115 },
+    "5478": { sector: `Sector 4: Oriente CTM (Habitacional Vertical)`, col: `U. Hab. San Pablo CTM`, limites: `N: CECYTEM, S: Calle 6, E: Cto. San Pablo Ote., O: Cto. San Pablo Pte.`, nse: `D+ / Media`, nominal: `3800`, votacion: `1558`, part: `0.41`, ganador: `MORENA`, riesgo: `🔴 Alta / Células de pasillo`, estrategia: `MOVILIZAR (Combate Abstencionismo)`, referente: `Armando Garnica, Alicia`, lat: 19.671, lng: -99.1215 },
+    "5479": { sector: `Sector 4: Oriente CTM (Habitacional Vertical)`, col: `U. Hab. San Pablo CTM`, limites: `(Polígono Interior CTM)`, nse: `D+ / Media`, nominal: `3100`, votacion: `1209`, part: `0.39`, ganador: `MORENA`, riesgo: `🔴 Alta / Foco Rojo Abstención`, estrategia: `MOVILIZAR (Combate Abstencionismo)`, referente: `Armando Garnica, Alicia`, lat: 19.6725, lng: -99.123 },
+    "5480": { sector: `Sector 4: Oriente CTM (Habitacional Vertical)`, col: `U. Hab. San Pablo CTM`, limites: `(Polígono Interior CTM)`, nse: `D+ / Media`, nominal: `2500`, votacion: `1025`, part: `0.41`, ganador: `MORENA`, riesgo: `🔴 Alta / Alta rotación poblacional`, estrategia: `MOVILIZAR (Combate Abstencionismo)`, referente: `Armando Garnica, Alicia`, lat: 19.674, lng: -99.1245 },
+    "5481": { sector: `Sector 4: Oriente CTM (Habitacional Vertical)`, col: `U. Hab. San Pablo CTM`, limites: `(Polígono Interior CTM)`, nse: `D / Alta`, nominal: `4000`, votacion: `1600`, part: `0.4`, ganador: `MORENA`, riesgo: `🔴 Alta / Zona frontera`, estrategia: `MOVILIZAR (Combate Abstencionismo)`, referente: `Armando Garnica, Alicia`, lat: 19.6755, lng: -99.126 },
+    "6639": { sector: `Sector 4: Oriente CTM (Habitacional Vertical)`, col: `U. Hab. San Pablo CTM (Sur)`, limites: `(Polígono Reseccionado Sur)`, nse: `D+ / Media`, nominal: `3400`, votacion: `1462`, part: `0.43`, ganador: `MORENA`, riesgo: `🟡 Media / Complejos cerrados`, estrategia: `MOVILIZAR (Combate Abstencionismo)`, referente: `Armando Garnica, Alicia`, lat: 19.671, lng: -99.1215 },
+    "6683": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. Paseos de Tultepec II`, limites: `(Nuevo Polígono Habitacional Oriente)`, nse: `C- / Baja`, nominal: `3100`, votacion: `1488`, part: `0.48`, ganador: `COALICIÓN`, riesgo: `⚫ Riesgo / Competido`, estrategia: `PERSUADIR (Campaña Aire / Contraste)`, referente: `May Cabello`, lat: 19.685, lng: -99.105 },
+    "6684": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `La Antigua, Paseos de Tultepec II`, limites: `(Nuevo Polígono Habitacional Oriente)`, nse: `C- / Baja`, nominal: `2900`, votacion: `1392`, part: `0.48`, ganador: `COALICIÓN`, riesgo: `⚫ Riesgo / Competido`, estrategia: `PERSUADIR (Campaña Aire / Contraste)`, referente: `May Cabello`, lat: 19.6865, lng: -99.1065 },
+    "6685": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `El Bosque Tultepec, El Dorado`, limites: `(Nuevo Polígono Norte)`, nse: `C / Baja`, nominal: `3500`, votacion: `1785`, part: `0.51`, ganador: `COALICIÓN`, riesgo: `⚫ Riesgo / Media-Alta`, estrategia: `PERSUADIR (Campaña Aire / Contraste)`, referente: `Norma Nubia`, lat: 19.688, lng: -99.108 },
+    "6686": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. Hacienda del Jardín 2a Secc.`, limites: `(Polígono Colindante Teyahualco)`, nse: `C- / Baja`, nominal: `2700`, votacion: `1323`, part: `0.49`, ganador: `COALICIÓN`, riesgo: `⚫ Riesgo`, estrategia: `PERSUADIR (Campaña Aire / Contraste)`, referente: `Claudia Ordaz`, lat: 19.6895, lng: -99.1095 },
+    "6687": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. El Bosque Tultepec`, limites: `(Nuevo Polígono Norte)`, nse: `C / Baja`, nominal: `2800`, votacion: `1400`, part: `0.5`, ganador: `COALICIÓN`, riesgo: `⚫ Riesgo`, estrategia: `PERSUADIR (Campaña Aire / Contraste)`, referente: `Norma Nubia`, lat: 19.691, lng: -99.111 },
+    "6688": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. Hacienda del Jardín 1a Secc.`, limites: `(Polígono Colindante Teyahualco)`, nse: `C- / Baja`, nominal: `2600`, votacion: `1274`, part: `0.49`, ganador: `COALICIÓN`, riesgo: `⚫ Riesgo`, estrategia: `PERSUADIR (Campaña Aire / Contraste)`, referente: `Claudia Ordaz`, lat: 19.6925, lng: -99.1125 },
+    "6689": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. Hacienda del Jardín 2a Secc.`, limites: `(Polígono Colindante Teyahualco)`, nse: `C- / Baja`, nominal: `2500`, votacion: `1225`, part: `0.49`, ganador: `COALICIÓN`, riesgo: `⚫ Riesgo`, estrategia: `PERSUADIR (Campaña Aire / Contraste)`, referente: `Claudia Ordaz`, lat: 19.685, lng: -99.105 },
+    "6930": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Col. El Quemado, Rancho Santa Elena`, limites: `N: Blvd. de la Joya`, nse: `C / Baja`, nominal: `3900`, votacion: `1950`, part: `0.5`, ganador: `COALICIÓN`, riesgo: `⚫ Riesgo / Fuerte oposición`, estrategia: `PERSUADIR (Campaña Aire / Contraste)`, referente: `Ma. Luisa, Teresa, Carlos Galicia`, lat: 19.6975, lng: -99.1025 },
+    "6931": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. Santa Elena (N)`, limites: `(Polígono Norte Elena)`, nse: `C / Baja`, nominal: `2800`, votacion: `1372`, part: `0.49`, ganador: `COALICIÓN`, riesgo: `⚫ Riesgo / Competido`, estrategia: `PERSUADIR (Campaña Aire / Contraste)`, referente: `Teresa, Carlos Galicia`, lat: 19.699, lng: -99.104 },
+    "6932": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. Santa Elena (C)`, limites: `(Polígono Centro Elena)`, nse: `C / Baja`, nominal: `2600`, votacion: `1222`, part: `0.47`, ganador: `COALICIÓN`, riesgo: `⚫ Riesgo / Volatilidad`, estrategia: `PERSUADIR (Campaña Aire / Contraste)`, referente: `Teresa, Carlos Galicia`, lat: 19.7005, lng: -99.1055 },
+    "6934": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. Santa Elena (Ote)`, limites: `(Polígono Oriente Elena)`, nse: `C / Baja`, nominal: `2900`, votacion: `1334`, part: `0.46`, ganador: `COALICIÓN`, riesgo: `⚫ Riesgo / Clase media`, estrategia: `PERSUADIR (Campaña Aire / Contraste)`, referente: `Teresa, Carlos Galicia`, lat: 19.702, lng: -99.107 },
+    "6935": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. Santa Elena (S)`, limites: `(Polígono Sur Elena)`, nse: `C / Baja`, nominal: `2500`, votacion: `1125`, part: `0.45`, ganador: `COALICIÓN`, riesgo: `⚫ Riesgo / Zonas nuevas`, estrategia: `PERSUADIR (Campaña Aire / Contraste)`, referente: `Teresa, Carlos Galicia`, lat: 19.7035, lng: -99.1085 },
+    "6936": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. Santa Elena, Ángel de Luz`, limites: `(Polígono Surponiente)`, nse: `C / Baja`, nominal: `4200`, votacion: `2016`, part: `0.48`, ganador: `COALICIÓN`, riesgo: `⚫ Riesgo / Zonas de plusvalía`, estrategia: `PERSUADIR (Campaña Aire / Contraste)`, referente: `Teresa, Carlos Galicia`, lat: 19.705, lng: -99.11 },
+    "6937": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. Hacienda Real de Tultepec (N)`, limites: `(Polígono Norte Hacienda)`, nse: `C- / Baja`, nominal: `2400`, votacion: `1224`, part: `0.51`, ganador: `MORENA`, riesgo: `🟡 Media / Ligeramente favorable`, estrategia: `MANTENER (Voto Duro)`, referente: `Martha Narveza, Sandra Lule, Vicky Contreras`, lat: 19.6735, lng: -99.1025 },
+    "6938": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. Hacienda Real de Tultepec (C)`, limites: `(Polígono Centro Hacienda)`, nse: `C- / Baja`, nominal: `2600`, votacion: `1300`, part: `0.5`, ganador: `MORENA`, riesgo: `🟡 Media / Organización vecinal`, estrategia: `MANTENER (Voto Duro)`, referente: `Martha Narveza, Sandra Lule, Vicky Contreras`, lat: 19.675, lng: -99.104 },
+    "6939": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. Hacienda Real de Tultepec (E)`, limites: `(Polígono Oriente Hacienda)`, nse: `C- / Baja`, nominal: `2700`, votacion: `1323`, part: `0.49`, ganador: `MORENA`, riesgo: `🟡 Media / Empate técnico`, estrategia: `MANTENER (Voto Duro)`, referente: `Martha Narveza, Sandra Lule, Vicky Contreras`, lat: 19.6765, lng: -99.1055 },
+    "6940": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. Hacienda Real de Tultepec (S)`, limites: `(Polígono Sur Hacienda)`, nse: `C- / Baja`, nominal: `2800`, votacion: `1232`, part: `0.44`, ganador: `MORENA`, riesgo: `🔴 Alta / Baja en participación`, estrategia: `MOVILIZAR (Combate Abstencionismo)`, referente: `Martha Narveza, Sandra Lule, Vicky Contreras`, lat: 19.678, lng: -99.107 },
+    "6941": { sector: `Sector 5: Residencial Nuevo (Fraccionamientos Cerrados)`, col: `Fracc. Hacienda Real de Tultepec (Ext)`, limites: `(Polígono Extensión Hacienda)`, nse: `C- / Baja`, nominal: `3100`, votacion: `1550`, part: `0.5`, ganador: `MORENA`, riesgo: `🟡 Media / Crecimiento poblacional`, estrategia: `MANTENER (Voto Duro)`, referente: `Martha Narveza, Sandra Lule, Vicky Contreras`, lat: 19.6795, lng: -99.1085 },
+};
 
-        function seleccionarSeccion(seccion) {
-            if(!seccion) {
-                document.getElementById('details').innerHTML = '';
-                return;
+        function dibujarMarcadores() {
+            capaMarcadores.clearLayers();
+            for (let id in db) {
+                let d = db[id];
+                let color = d.estrategia.includes('MANTENER') ? '#f59e0b' : d.estrategia.includes('MOVILIZAR') ? '#ef4444' : d.estrategia.includes('GESTIÓN') ? '#10b981' : d.estrategia.includes('BLINDAJE') ? '#8b5cf6' : '#3b82f6';
+                let m = L.circleMarker([d.lat, d.lng], { radius: 10, fillColor: color, color: '#fff', weight: 2, fillOpacity: 0.9 }).addTo(capaMarcadores);
+                m.on('click', () => { document.getElementById('buscador').value = id; seleccionarSeccion(id); });
+                marcadoresOriginales[id] = m;
             }
-            
-            const data = db[seccion];
-            const detailsDiv = document.getElementById('details');
-            
-            // Determinamos el color de la estrategia
-            let badgeClass = 'bg-persuadir'; // default azul
-            if(data.estrategia.includes('MANTENER')) badgeClass = 'bg-mantener';
-            if(data.estrategia.includes('MOVILIZAR')) badgeClass = 'bg-movilizar';
-            if(data.estrategia.includes('GESTIÓN')) badgeClass = 'bg-mantener'; // Verde/Naranja
-            
-            // Construimos la ruta del mapa
-            const rutaPDF = `mapas/${seccion}.pdf`;
+        }
+        dibujarMarcadores();
 
-            detailsDiv.innerHTML = `
-                <div style="background: var(--morena); color: white; padding: 8px 12px; border-radius: 4px; margin-bottom: 15px;">
-                    <h2 style="margin: 0; font-size: 16px;">SECCIÓN ${data.seccion}</h2>
-                    <p style="margin: 2px 0 0 0; font-size: 11px; opacity: 0.9;">${data.sector}</p>
+        function seleccionarSeccion(id) {
+            if(!id) return;
+            const d = db[id];
+            const color = d.estrategia.includes('MANTENER') ? 'bg-mantener' : d.estrategia.includes('MOVILIZAR') ? 'bg-movilizar' : d.estrategia.includes('GESTIÓN') ? 'bg-gestion' : d.estrategia.includes('BLINDAJE') ? 'bg-blindaje' : 'bg-persuadir';
+            
+            document.getElementById('details').innerHTML = `
+                <div style="background: var(--morena); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <h2 style="margin:0; font-size: 20px;">SECCIÓN ${id}</h2>
+                    <p style="margin:5px 0 0; font-size:11px; opacity:0.9; line-height:1.3;">${d.sector}</p>
                 </div>
-
                 <div class="ficha-tecnica">
-                    <p><strong>Localidades/Colonias:</strong> ${data.col}</p>
-                    <p><strong>Delimitadores (N/S/E/O):</strong> ${data.limites}</p>
-                    <p><strong>Tipo Asentamiento:</strong> ${data.tipo}</p>
-                    <p><strong>NSE / Pobreza:</strong> ${data.nse}</p>
-                    <p><strong>Lista Nominal (2026):</strong> ${data.listaNominal}</p>
-                    <p><strong>Participación Est.:</strong> ${data.part}</p>
-                    <p><strong>Votación Est.:</strong> ${data.votacionEst}</p>
-                    <p><strong>Ganador Histórico:</strong> ${data.ganadorHist}</p>
-                    <p><strong>Prioridad / Riesgo:</strong> ${data.riesgo}</p>
-                    <p><strong>Estrategia:</strong> <span class="badge ${badgeClass}">${data.estrategia}</span></p>
+                    <p><strong>Localidades / Colonias:</strong> ${d.col}</p>
+                    <p><strong>Delimitadores Geográficos:</strong> ${d.limites}</p>
+                    <p><strong>NSE / Pobreza:</strong> ${d.nse}</p>
+                    <div style="display:flex; justify-content:space-between; border-bottom: 1px solid #f3f4f6; padding-bottom: 8px;">
+                        <div style="width:50%"><strong>Lista Nominal:</strong> ${d.nominal}</div>
+                        <div style="width:50%"><strong>Votación Est:</strong> ${d.votacion} (${d.part})</div>
+                    </div>
+                    <p><strong>Ganador Histórico:</strong> ${d.ganador}</p>
+                    <p><strong>Prioridad / Riesgo:</strong> ${d.riesgo}</p>
+                    <p><strong>Estrategia Asignada:</strong><br><span class="badge ${color}">${d.estrategia}</span></p>
                     
-                    <div style="margin-top: 15px; padding: 10px; background: #fff; border: 1px solid #e5e7eb; border-radius: 4px; border-left: 3px solid #10b981;">
-                        <p style="margin: 0 0 5px 0;"><strong>Referente Operativo:</strong></p>
-                        <input type="text" id="refInput_${seccion}" class="input-referente" value="${data.referente}">
-                        <button class="btn-guardar" onclick="guardarReferente('${seccion}')">Guardar</button>
-                        <span id="saveMsg_${seccion}" style="display:none; color:#10b981; font-size:10px; margin-left:5px;">¡Guardado!</span>
+                    <div class="referente-box">
+                        <strong>Referente Territorial:</strong>
+                        <input type="text" id="input_${id}" class="input-referente" value="${d.referente !== 'nan' ? d.referente : 'Por asignar'}">
+                        <button class="btn-guardar" onclick="guardarLocal('${id}')">💾 Guardar Cambios</button>
+                        <p id="msg_${id}" style="display:none; color:#10b981; font-size:11px; margin-top:8px; font-weight:bold;">¡Actualizado correctamente!</p>
                     </div>
                 </div>
-                
-                <a href="${rutaPDF}" target="_blank" class="btn-mapa">
-                    🗺️ Abrir Cartografía (PDF)
-                </a>
+                <a href="mapas/${id}.pdf" target="_blank" class="btn-mapa">🗺️ VER CARTOGRAFÍA OFICIAL (PDF)</a>
             `;
 
-            // Llama a la función para pintar el mapa (explicada abajo)
-            resaltarSeccionEnMapa(seccion);
-        }
-
-        // Función para simular el guardado del referente
-        function guardarReferente(seccion) {
-            const nuevoReferente = document.getElementById(`refInput_${seccion}`).value;
-            db[seccion].referente = nuevoReferente; // Actualiza la base de datos temporal en memoria
-            
-            const msg = document.getElementById(`saveMsg_${seccion}`);
-            msg.style.display = 'inline';
-            setTimeout(() => { msg.style.display = 'none'; }, 2000);
-        }
-
-        // Función para Sombrear/Pintar la sección en el mapa
-        function resaltarSeccionEnMapa(seccion) {
-            // Esta función actuará cuando conectes tu archivo GeoJSON (el dibujo de las calles).
-            // Lógica: Si ya hay una sección pintada, le quitamos el color fuerte.
-            // Luego, buscamos la sección seleccionada y la pintamos de rojo/guinda.
-            
-            if(capaGeoJSON) {
-                capaGeoJSON.eachLayer(function (layer) {
-                    // Restablecemos el estilo de todas
-                    capaGeoJSON.resetStyle(layer); 
-                    
-                    // Si el número de sección del polígono coincide con la búsqueda
-                    if (layer.feature.properties.SECCION == seccion) {
-                        layer.setStyle({
-                            weight: 3,
-                            color: '#b3282d', // Borde Guinda
-                            fillColor: '#b3282d', // Relleno Guinda
-                            fillOpacity: 0.5
-                        });
-                        // Centramos el mapa visualmente en esa sección
-                        map.fitBounds(layer.getBounds());
-                    }
-                });
+            for (let s in marcadoresOriginales) {
+                let m = marcadoresOriginales[s];
+                if (s === id) { m.setStyle({ radius: 15, fillOpacity: 1 }); m.bringToFront(); if(m.getElement()) m.getElement().classList.add('pulsing-marker'); }
+                else { m.setStyle({ radius: 7, fillOpacity: 0.3 }); if(m.getElement()) m.getElement().classList.remove('pulsing-marker'); }
             }
+            map.flyTo([d.lat, d.lng], 16, { animate: true, duration: 1.5 });
+        }
+
+        function guardarLocal(id) {
+            const val = document.getElementById('input_'+id).value;
+            db[id].referente = val;
+            const msg = document.getElementById('msg_'+id);
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 2500);
         }
     </script>
 </body>
