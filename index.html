@@ -16,16 +16,12 @@
         :root { --morena: #b3282d; --bg: #f3f4f6; --text-main: #111827; --text-muted: #6b7280; --border: #e5e7eb; }
         body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); height: 100vh; overflow: hidden; }
         
-        /* PANTALLA DE LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .login-box { width: 90%; max-width: 350px; text-align: center; }
         .login-box h1 { color: var(--morena); border-bottom: 3px solid var(--morena); padding-bottom: 10px; margin-bottom: 30px; font-size: 26px; }
         .login-input { width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box; background: #f9fafb; text-align: center; }
         .btn-login { width: 100%; padding: 15px; background: var(--morena); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-login:active { transform: scale(0.98); }
-        .loader { display: none; margin-top: 15px; color: var(--text-muted); font-size: 14px; font-weight: bold; }
-
-        /* APLICACIÓN C4 */
+        
         #app-screen { display: none; height: 100%; flex-direction: row; }
         #sidebar { width: 400px; background: white; padding: 20px; box-shadow: 4px 0 10px rgba(0,0,0,0.05); overflow-y: auto; z-index: 1000; display: flex; flex-direction: column; }
         #map { flex-grow: 1; height: 100%; position: relative; z-index: 1; }
@@ -34,21 +30,20 @@
         .header-c4 h2 { margin: 0; font-size: 20px; color: var(--text-main); }
         .user-badge { background: #f9fafb; border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: bold; color: var(--morena); }
         
+        /* MEJORA 2: Estilos del Buscador para Celular */
+        #buscador { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 13px; color: #333; background: white; margin-bottom: 15px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+        #buscador optgroup { font-size: 11px; color: var(--text-muted); font-weight: bold; }
+        #buscador option { font-size: 13px; color: var(--text-main); }
+
         .ficha-tecnica { font-size: 14px; color: #333; }
         .ficha-tecnica p { margin: 10px 0; border-bottom: 1px solid #f3f4f6; padding-bottom: 8px; word-wrap: break-word; }
         .ficha-tecnica strong { color: var(--text-muted); display: block; margin-bottom: 2px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .badge { display: inline-block; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; color: white; margin-top: 5px; text-align: center; }
-        .bg-mantener { background-color: #f59e0b; }
-        .bg-movilizar { background-color: #ef4444; }
-        .bg-persuadir { background-color: #3b82f6; }
-        .bg-gestion { background-color: #10b981; }
-        .bg-blindaje { background-color: #8b5cf6; }
+        .bg-mantener { background-color: #f59e0b; } .bg-movilizar { background-color: #ef4444; } .bg-persuadir { background-color: #3b82f6; } .bg-gestion { background-color: #10b981; } .bg-blindaje { background-color: #8b5cf6; }
 
         .btn-accion { display: block; width: 100%; padding: 14px; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-align: center; margin-top: 10px; font-size: 14px; }
-        .btn-ruta { background: #3b82f6; }
-        .btn-wa { background: #25D366; color: white; }
-        .btn-mapa { background: var(--text-main); }
+        .btn-ruta { background: #3b82f6; } .btn-wa { background: #25D366; } .btn-mapa { background: var(--text-main); }
         
         .instruccion-box { background: #f9fafb; border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-top: 15px; border-left: 4px solid #25D366;}
         .instruccion-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; margin-top: 5px; box-sizing: border-box; }
@@ -72,7 +67,7 @@
             <input type="text" id="user" class="login-input" placeholder="Usuario Operativo" autocomplete="off" autocapitalize="off">
             <input type="password" id="pin" class="login-input" placeholder="PIN de Seguridad" inputmode="numeric" pattern="[0-9]*">
             <button class="btn-login" onclick="iniciarSesion()">INGRESAR AL TERRITORIO</button>
-            <div id="loader" class="loader">Validando encriptación... ⏳</div>
+            <div id="loader" style="display:none; margin-top:15px; font-size:14px; color:#6b7280;">Autenticando y encriptando... ⏳</div>
         </div>
     </div>
 
@@ -83,9 +78,9 @@
                 <span id="user-info" class="user-badge">Cargando...</span>
             </div>
             
-            <select id="buscador" onchange="seleccionarSeccion(this.value)" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 15px; margin-bottom: 15px;">
+            <select id="buscador" onchange="seleccionarSeccion(this.value)">
                 <option value="">🔍 Seleccionar Sección...</option>
-                </select>
+            </select>
 
             <div id="details">
                 <p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-top: 40px;"><em>Autenticación exitosa. Selecciona una sección para iniciar operaciones.</em></p>
@@ -95,16 +90,11 @@
     </div>
 
     <script>
-        // LA LLAVE DE ORO (Tu URL de Google Apps Script)
+        // PEGA AQUÍ TU URL EXACTA DEL PASO ANTERIOR
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMp8JRjJgoo70qYseF8saqlsy1_LhBGwNPLLJyzGJKvPDvZLRcW08xUM6am9aIIsuFaA/exec";
         
-        let map;
-        let capaMarcadores;
-        let marcadoresOriginales = {};
-        let dbSecciones = {}; 
-        let datosUsuario = {};
+        let map; let capaMarcadores; let marcadoresOriginales = {}; let dbSecciones = {}; let datosUsuario = {};
 
-        // INICIALIZAR MAPA
         function initMap() {
             map = L.map('map', { zoomControl: false }).setView([19.6842, -99.1286], 13);
             L.control.zoom({ position: 'topright' }).addTo(map);
@@ -112,21 +102,17 @@
             capaMarcadores = L.featureGroup().addTo(map);
         }
 
-        // MÓDULO DE LOGIN
         async function iniciarSesion() {
-            const user = document.getElementById('user').value.trim();
-            const pin = document.getElementById('pin').value.trim();
-            const loader = document.getElementById('loader');
+            const user = document.getElementById('user').value;
+            const pin = document.getElementById('pin').value;
+            if(!user || !pin) return alert("Ingresa Usuario y PIN.");
             
-            if(!user || !pin) return alert("Por favor, ingresa Usuario y PIN.");
-            
-            loader.style.display = "block";
+            document.getElementById('loader').style.display = "block";
             
             try {
-                // Hacemos la petición a tu Google Sheets
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' }, // Evita errores CORS
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({ action: 'login', usuario: user, pin: pin })
                 });
                 
@@ -138,15 +124,14 @@
                     cargarTerritorio();
                 } else {
                     alert("Acceso denegado. Credenciales incorrectas.");
-                    loader.style.display = "none";
+                    document.getElementById('loader').style.display = "none";
                 }
             } catch (error) {
-                alert("Error de conexión. Revisa tu internet.");
-                loader.style.display = "none";
+                alert("Error de conexión a la Base Maestra.");
+                document.getElementById('loader').style.display = "none";
             }
         }
 
-        // MÓDULO DE CARGA DE DATOS (INTELIGENCIA)
         async function cargarTerritorio() {
             try {
                 const response = await fetch(SCRIPT_URL, {
@@ -156,16 +141,15 @@
                 });
                 
                 const data = await response.json();
-                
-                // Limpiar select
                 const buscador = document.getElementById('buscador');
                 buscador.innerHTML = '<option value="">🔍 Seleccionar Sección...</option>';
                 
-                // Agrupar por sector para el buscador
                 let sectores = {};
                 
                 data.forEach(row => {
-                    // Generamos coordenadas aproximadas si no están en la base
+                    // MEJORA 4: Detección a prueba de fallos de la columna Teléfono
+                    let telReal = row.Telefono || row.Teléfono || row.TELEFONO || row.Tel || "";
+
                     let lat = 19.684 + (Math.random() * 0.02 - 0.01);
                     let lng = -99.128 + (Math.random() * 0.02 - 0.01);
                     
@@ -180,7 +164,7 @@
                         riesgo: row.Prioridad_Riesgo,
                         estrategia: row.Estrategia_Asignada,
                         referente: row.REFERENTE || row.Referente || "No asignado",
-                        telefono: row.Telefono || "", // Columna que agregaste
+                        telefono: telReal,
                         lat: lat, lng: lng
                     };
 
@@ -188,21 +172,20 @@
                     sectores[row.Sector_Geografico_Operativo_Plan_A].push(row);
                 });
 
-                // Llenar el Dropdown
+                // Llenar el Dropdown con texto ajustado
                 for (let sec in sectores) {
                     let optgroup = document.createElement('optgroup');
-                    optgroup.label = sec;
+                    optgroup.label = (sec || "Sector").substring(0, 30);
                     sectores[sec].forEach(row => {
-                        let shortCol = (row.Localidades_Colonias || "").substring(0, 25) + "..";
+                        let shortCol = (row.Localidades_Colonias || "").substring(0, 35) + "...";
                         let opt = document.createElement('option');
                         opt.value = row.Seccion;
-                        opt.textContent = `${row.Seccion} (${shortCol})`;
+                        opt.textContent = `${row.Seccion} - ${shortCol}`;
                         optgroup.appendChild(opt);
                     });
                     buscador.appendChild(optgroup);
                 }
 
-                // Cambiar pantalla
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-screen').style.display = 'flex';
                 
@@ -214,7 +197,6 @@
             }
         }
 
-        // MÓDULO DE DIBUJO DE MAPA
         function dibujarMarcadores() {
             capaMarcadores.clearLayers();
             for (let id in dbSecciones) {
@@ -226,17 +208,13 @@
                     if(d.estrategia.includes('GESTIÓN')) color = '#10b981';
                     if(d.estrategia.includes('BLINDAJE')) color = '#8b5cf6';
                 }
-                
                 let m = L.circleMarker([d.lat, d.lng], { radius: 10, fillColor: color, color: '#fff', weight: 2, fillOpacity: 0.9 }).addTo(capaMarcadores);
                 m.on('click', () => { document.getElementById('buscador').value = id; seleccionarSeccion(id); });
                 marcadoresOriginales[id] = m;
             }
-            if(Object.keys(dbSecciones).length > 0) {
-                map.fitBounds(capaMarcadores.getBounds(), { padding: [20, 20] });
-            }
+            if(Object.keys(dbSecciones).length > 0) map.fitBounds(capaMarcadores.getBounds(), { padding: [20, 20] });
         }
 
-        // MÓDULO DE FICHA TÉCNICA E INTERACCIONES
         function seleccionarSeccion(id) {
             if(!id) return;
             const d = dbSecciones[id];
@@ -247,6 +225,8 @@
             if(d.estrategia.includes('GESTIÓN')) colorClass = 'bg-gestion';
             if(d.estrategia.includes('BLINDAJE')) colorClass = 'bg-blindaje';
             
+            let telDisplay = d.telefono ? d.telefono : '<span style="color:#ef4444;">Sin registro en Base</span>';
+
             document.getElementById('details').innerHTML = `
                 <div style="background: var(--morena); color: white; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
                     <h2 style="margin:0; font-size: 18px;">SECCIÓN ${id}</h2>
@@ -254,7 +234,7 @@
                 </div>
                 
                 <div class="ficha-tecnica">
-                    <p><strong>Referente:</strong> 👤 ${d.referente} <br>📞 ${d.telefono || "S/N"}</p>
+                    <p><strong>Referente:</strong> 👤 ${d.referente} <br>📞 ${telDisplay}</p>
                     <p><strong>Colonias:</strong> ${d.col}</p>
                     <p><strong>Delimitadores:</strong> ${d.limites}</p>
                     <p><strong>Lista Nominal:</strong> ${d.nominal} personas</p>
@@ -266,9 +246,7 @@
                         <input type="text" id="instruccion_${id}" class="instruccion-input" placeholder="Ej: Reforzar barrido en zona norte...">
                         <button class="btn-accion btn-wa" onclick="enviarWhatsApp('${id}')">Enviar Misión por WhatsApp</button>
                     </div>
-
                     <button class="btn-accion btn-ruta" onclick="trazarRuta(${d.lat}, ${d.lng})">📍 Trazar Ruta (Google Maps)</button>
-                    
                 </div>
             `;
 
@@ -280,31 +258,20 @@
             map.flyTo([d.lat, d.lng], 16, { animate: true, duration: 1.5 });
         }
 
-        // FUNCIÓN: WHATSAPP
         function enviarWhatsApp(id) {
             const d = dbSecciones[id];
             const instruccion = document.getElementById('instruccion_'+id).value;
             if(!d.telefono || d.telefono.length < 10) {
-                alert("No hay un número de teléfono válido registrado para este referente.");
+                alert("No hay un número válido en la Base Maestra para esta sección.");
                 return;
             }
-            
-            let mensaje = `🚨 *OBJETIVO C4: SECCIÓN ${id}*\n`;
-            mensaje += `📍 *Sector:* ${d.sector}\n`;
-            mensaje += `🎯 *Estrategia:* ${d.estrategia}\n`;
-            mensaje += `👥 *Lista Nominal:* ${d.nominal}\n`;
-            mensaje += `⚠️ *Prioridad:* ${d.riesgo}\n\n`;
-            mensaje += `📋 *INSTRUCCIÓN:* ${instruccion || "Acudir a la sección indicada para barrido territorial."}\n\n`;
-            mensaje += `🗺️ *Ruta:* https://www.google.com/maps/dir/?api=1&destination=${d.lat},${d.lng}`;
-            
-            // Reemplazar espacios para URL
+            let mensaje = `🚨 *OBJETIVO C4: SECCIÓN ${id}*\n📍 *Sector:* ${d.sector}\n🎯 *Estrategia:* ${d.estrategia}\n👥 *Lista Nominal:* ${d.nominal}\n⚠️ *Prioridad:* ${d.riesgo}\n\n📋 *INSTRUCCIÓN:* ${instruccion || "Acudir a la sección indicada para barrido territorial."}\n\n🗺️ *Ruta:* https://www.google.com/maps/dir/?api=1&destination=$${d.lat},${d.lng}`;
             let encodedMsg = encodeURIComponent(mensaje);
             window.open(`https://wa.me/52${d.telefono}?text=${encodedMsg}`, '_blank');
         }
 
-        // FUNCIÓN: GOOGLE MAPS
         function trazarRuta(lat, lng) {
-            window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
+            window.open(`https://www.google.com/maps/dir/?api=1&destination=$${lat},${lng}`, '_blank');
         }
     </script>
 </body>
