@@ -3,58 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#b3282d">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Tultepec27">
-    <title>Tultepec 27 - C4 Inteligencia</title>
+    <title>Inteligencia Territorial</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <style>
-        :root { --morena: #b3282d; --bg: #f3f4f6; --text-main: #111827; --text-muted: #6b7280; --border: #e5e7eb; }
-        body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); height: 100vh; overflow: hidden; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #f3f4f6; height: 100vh; overflow: hidden; color: #333; }
         
+        /* LOGIN MINIMALISTA Y PROFESIONAL */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .login-box { width: 90%; max-width: 350px; text-align: center; }
-        .login-box h1 { color: var(--morena); border-bottom: 3px solid var(--morena); padding-bottom: 10px; margin-bottom: 30px; font-size: 26px; }
-        .login-input { width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; box-sizing: border-box; background: #f9fafb; text-align: center; }
-        .btn-login { width: 100%; padding: 15px; background: var(--morena); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .login-box { width: 90%; max-width: 320px; }
+        .login-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; text-align: center; border-radius: 6px;} /* 16px evita zoom en iPhone */
+        .btn-login { width: 100%; padding: 12px; background: #111; color: white; border: none; font-size: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; border-radius: 6px; }
+        .btn-login:active { background: #333; }
         
+        /* INTERFAZ PRINCIPAL */
         #app-screen { display: none; height: 100%; flex-direction: row; }
-        #sidebar { width: 400px; background: white; padding: 20px; box-shadow: 4px 0 10px rgba(0,0,0,0.05); overflow-y: auto; z-index: 1000; display: flex; flex-direction: column; }
+        #sidebar { width: 380px; background: #f9fafb; padding: 20px; border-right: 1px solid #e5e7eb; overflow-y: auto; z-index: 1000; display: flex; flex-direction: column; }
         #map { flex-grow: 1; height: 100%; position: relative; z-index: 1; }
         
-        .header-c4 { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--morena); padding-bottom: 12px; margin-bottom: 15px; }
-        .header-c4 h2 { margin: 0; font-size: 20px; color: var(--text-main); }
-        .user-badge { background: #f9fafb; border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: bold; color: var(--morena); }
+        /* BUSCADOR OPTIMIZADO PARA MÓVIL */
+        #buscador { width: 100%; padding: 12px 10px; border: 1px solid #ccc; font-size: 14px; color: #333; background: white; margin-bottom: 5px; border-radius: 6px;}
         
-        /* MEJORA 2: Estilos del Buscador para Celular */
-        #buscador { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 13px; color: #333; background: white; margin-bottom: 15px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
-        #buscador optgroup { font-size: 11px; color: var(--text-muted); font-weight: bold; }
-        #buscador option { font-size: 13px; color: var(--text-main); }
-
-        .ficha-tecnica { font-size: 14px; color: #333; }
-        .ficha-tecnica p { margin: 10px 0; border-bottom: 1px solid #f3f4f6; padding-bottom: 8px; word-wrap: break-word; }
-        .ficha-tecnica strong { color: var(--text-muted); display: block; margin-bottom: 2px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        /* TARJETA BLANCA */
+        .tarjeta-blanca { background: #ffffff; border: 1px solid #ccc; padding: 20px; margin-top: 15px; font-size: 13px; line-height: 1.6; border-radius: 6px;}
+        .tarjeta-blanca p { margin: 6px 0; }
+        .tarjeta-blanca strong { color: #000; }
         
-        .badge { display: inline-block; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; color: white; margin-top: 5px; text-align: center; }
-        .bg-mantener { background-color: #f59e0b; } .bg-movilizar { background-color: #ef4444; } .bg-persuadir { background-color: #3b82f6; } .bg-gestion { background-color: #10b981; } .bg-blindaje { background-color: #8b5cf6; }
-
-        .btn-accion { display: block; width: 100%; padding: 14px; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-align: center; margin-top: 10px; font-size: 14px; }
-        .btn-ruta { background: #3b82f6; } .btn-wa { background: #25D366; } .btn-mapa { background: var(--text-main); }
+        /* BOTONES PROFESIONALES */
+        .btn-accion { display: block; width: 100%; padding: 12px; color: #000; border: 1px solid #ccc; background: #f9fafb; cursor: pointer; text-align: center; margin-top: 10px; font-size: 13px; text-decoration: none; border-radius: 6px; font-weight: bold;}
+        .btn-accion:active { background: #e5e7eb; }
         
-        .instruccion-box { background: #f9fafb; border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-top: 15px; border-left: 4px solid #25D366;}
-        .instruccion-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; margin-top: 5px; box-sizing: border-box; }
-
-        .pulsing-marker { animation: pulse 1.2s infinite alternate; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.6); opacity: 1; } }
+        .instruccion-input { width: 100%; padding: 12px; border: 1px solid #ccc; font-size: 14px; margin-top: 10px; margin-bottom: 5px; box-sizing: border-box; border-radius: 6px;}
 
         @media (max-width: 768px) {
             #app-screen { flex-direction: column; }
-            #sidebar { width: 100%; height: 60vh; order: 2; border-radius: 20px 20px 0 0; margin-top: -25px; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); }
-            #map { width: 100%; height: 40vh; order: 1; }
+            #sidebar { width: 100%; height: 50vh; order: 2; padding: 15px; border-right: none; border-top: 1px solid #ccc; }
+            #map { width: 100%; height: 50vh; order: 1; }
         }
     </style>
 </head>
@@ -62,35 +49,32 @@
 
     <div id="login-screen">
         <div class="login-box">
-            <h1>📍 C4 - TULTEPEC 27</h1>
-            <p style="color: #6b7280; font-size: 14px; margin-bottom: 20px;">Acceso Restringido</p>
-            <input type="text" id="user" class="login-input" placeholder="Usuario Operativo" autocomplete="off" autocapitalize="off">
-            <input type="password" id="pin" class="login-input" placeholder="PIN de Seguridad" inputmode="numeric" pattern="[0-9]*">
-            <button class="btn-login" onclick="iniciarSesion()">INGRESAR AL TERRITORIO</button>
-            <div id="loader" style="display:none; margin-top:15px; font-size:14px; color:#6b7280;">Autenticando y encriptando... ⏳</div>
+            <input type="text" id="user" class="login-input" placeholder="Usuario" autocomplete="off" autocapitalize="off">
+            <input type="password" id="pin" class="login-input" placeholder="PIN" inputmode="numeric" pattern="[0-9]*">
+            <button class="btn-login" onclick="iniciarSesion()">Acceder</button>
+            <div id="loader" style="display:none; margin-top:15px; font-size:13px; color:#666; text-align:center;">Validando Seguridad...</div>
         </div>
     </div>
 
     <div id="app-screen">
         <div id="sidebar">
-            <div class="header-c4">
-                <h2>Tultepec27</h2>
-                <span id="user-info" class="user-badge">Cargando...</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <span style="font-size: 14px; font-weight: bold; color: #111;">Operación Territorial</span>
+                <span id="user-info" style="font-size: 11px; color: #666; border: 1px solid #ccc; padding: 3px 8px; border-radius: 4px;"></span>
             </div>
             
             <select id="buscador" onchange="seleccionarSeccion(this.value)">
-                <option value="">🔍 Seleccionar Sección...</option>
+                <option value="">Seleccionar Sección...</option>
             </select>
 
             <div id="details">
-                <p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-top: 40px;"><em>Autenticación exitosa. Selecciona una sección para iniciar operaciones.</em></p>
+                <p style="font-size: 13px; color: #666; text-align: center; margin-top: 30px;">Seleccione una sección para iniciar el despliegue.</p>
             </div>
         </div>
         <div id="map"></div>
     </div>
 
     <script>
-        // PEGA AQUÍ TU URL EXACTA DEL PASO ANTERIOR
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMp8JRjJgoo70qYseF8saqlsy1_LhBGwNPLLJyzGJKvPDvZLRcW08xUM6am9aIIsuFaA/exec";
         
         let map; let capaMarcadores; let marcadoresOriginales = {}; let dbSecciones = {}; let datosUsuario = {};
@@ -105,7 +89,7 @@
         async function iniciarSesion() {
             const user = document.getElementById('user').value;
             const pin = document.getElementById('pin').value;
-            if(!user || !pin) return alert("Ingresa Usuario y PIN.");
+            if(!user || !pin) return;
             
             document.getElementById('loader').style.display = "block";
             
@@ -120,14 +104,14 @@
                 
                 if (result.status === 'success') {
                     datosUsuario = result;
-                    document.getElementById('user-info').innerText = `👤 ${datosUsuario.rol}`;
+                    document.getElementById('user-info').innerText = datosUsuario.rol;
                     cargarTerritorio();
                 } else {
-                    alert("Acceso denegado. Credenciales incorrectas.");
+                    alert("Credenciales incorrectas.");
                     document.getElementById('loader').style.display = "none";
                 }
             } catch (error) {
-                alert("Error de conexión a la Base Maestra.");
+                alert("Error de conexión con el Servidor Central.");
                 document.getElementById('loader').style.display = "none";
             }
         }
@@ -140,16 +124,26 @@
                     body: JSON.stringify({ action: 'getData', rol: datosUsuario.rol, sector: datosUsuario.sectorPermitido })
                 });
                 
-                const data = await response.json();
+                let data = await response.json();
+                
+                // ORDENAMIENTO DE SECTORES (Para que siempre empiece con el 1, luego el 2, etc.)
+                data.sort((a, b) => {
+                    let sA = (a.Sector_Geografico_Operativo_Plan_A || "").toString().trim();
+                    let sB = (b.Sector_Geografico_Operativo_Plan_A || "").toString().trim();
+                    return sA.localeCompare(sB, undefined, {numeric: true, sensitivity: 'base'});
+                });
+
                 const buscador = document.getElementById('buscador');
-                buscador.innerHTML = '<option value="">🔍 Seleccionar Sección...</option>';
+                buscador.innerHTML = '<option value="">Seleccionar Sección...</option>';
                 
                 let sectores = {};
                 
                 data.forEach(row => {
-                    // MEJORA 4: Detección a prueba de fallos de la columna Teléfono
-                    let telReal = row.Telefono || row.Teléfono || row.TELEFONO || row.Tel || "";
+                    if(row.Seccion === '6638' || row.Seccion === 6638) return; 
 
+                    let telReal = row.Telefono || row.Teléfono || row.TELEFONO || row.Tel || "S/N";
+
+                    // Dispersión geométrica leve para los pines en el mapa
                     let lat = 19.684 + (Math.random() * 0.02 - 0.01);
                     let lng = -99.128 + (Math.random() * 0.02 - 0.01);
                     
@@ -172,12 +166,17 @@
                     sectores[row.Sector_Geografico_Operativo_Plan_A].push(row);
                 });
 
-                // Llenar el Dropdown con texto ajustado
+                // Llenado del Buscador con textos recortados para celular
                 for (let sec in sectores) {
                     let optgroup = document.createElement('optgroup');
-                    optgroup.label = (sec || "Sector").substring(0, 30);
+                    let shortSector = (sec || "Sector").split("(")[0]; // Solo muestra "Sector 2: Centro " quitando lo del parentesis
+                    optgroup.label = shortSector;
+                    
                     sectores[sec].forEach(row => {
-                        let shortCol = (row.Localidades_Colonias || "").substring(0, 35) + "...";
+                        let colFull = row.Localidades_Colonias || "";
+                        let shortCol = colFull.substring(0, 26);
+                        if(colFull.length > 26) shortCol += "..."; // Agrega puntos si es muy larga
+                        
                         let opt = document.createElement('option');
                         opt.value = row.Seccion;
                         opt.textContent = `${row.Seccion} - ${shortCol}`;
@@ -193,7 +192,7 @@
                 dibujarMarcadores();
 
             } catch (error) {
-                alert("Error al cargar la cartografía.");
+                alert("Error al procesar la base de datos maestra.");
             }
         }
 
@@ -201,14 +200,8 @@
             capaMarcadores.clearLayers();
             for (let id in dbSecciones) {
                 let d = dbSecciones[id];
-                let color = '#3b82f6';
-                if(d.estrategia) {
-                    if(d.estrategia.includes('MANTENER')) color = '#f59e0b';
-                    if(d.estrategia.includes('MOVILIZAR')) color = '#ef4444';
-                    if(d.estrategia.includes('GESTIÓN')) color = '#10b981';
-                    if(d.estrategia.includes('BLINDAJE')) color = '#8b5cf6';
-                }
-                let m = L.circleMarker([d.lat, d.lng], { radius: 10, fillColor: color, color: '#fff', weight: 2, fillOpacity: 0.9 }).addTo(capaMarcadores);
+                let color = '#333'; 
+                let m = L.circleMarker([d.lat, d.lng], { radius: 8, fillColor: color, color: '#fff', weight: 1, fillOpacity: 0.8 }).addTo(capaMarcadores);
                 m.on('click', () => { document.getElementById('buscador').value = id; seleccionarSeccion(id); });
                 marcadoresOriginales[id] = m;
             }
@@ -219,59 +212,50 @@
             if(!id) return;
             const d = dbSecciones[id];
             
-            let colorClass = 'bg-persuadir';
-            if(d.estrategia.includes('MANTENER')) colorClass = 'bg-mantener';
-            if(d.estrategia.includes('MOVILIZAR')) colorClass = 'bg-movilizar';
-            if(d.estrategia.includes('GESTIÓN')) colorClass = 'bg-gestion';
-            if(d.estrategia.includes('BLINDAJE')) colorClass = 'bg-blindaje';
-            
-            let telDisplay = d.telefono ? d.telefono : '<span style="color:#ef4444;">Sin registro en Base</span>';
-
             document.getElementById('details').innerHTML = `
-                <div style="background: var(--morena); color: white; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-                    <h2 style="margin:0; font-size: 18px;">SECCIÓN ${id}</h2>
-                    <p style="margin:2px 0 0; font-size:11px; opacity:0.9;">${d.sector}</p>
-                </div>
-                
-                <div class="ficha-tecnica">
-                    <p><strong>Referente:</strong> 👤 ${d.referente} <br>📞 ${telDisplay}</p>
+                <div class="tarjeta-blanca">
+                    <p><strong>Sección:</strong> ${id}</p>
+                    <p><strong>Sector:</strong> ${d.sector}</p>
+                    <p><strong>Referente:</strong> ${d.referente} | <strong>Tel:</strong> ${d.telefono}</p>
                     <p><strong>Colonias:</strong> ${d.col}</p>
                     <p><strong>Delimitadores:</strong> ${d.limites}</p>
-                    <p><strong>Lista Nominal:</strong> ${d.nominal} personas</p>
-                    <p><strong>Prioridad / Riesgo:</strong> ${d.riesgo}</p>
-                    <p><strong>Estrategia:</strong><br><span class="badge ${colorClass}">${d.estrategia}</span></p>
+                    <p><strong>Lista Nominal:</strong> ${d.nominal}</p>
+                    <p><strong>Prioridad:</strong> ${d.riesgo}</p>
+                    <p><strong>Estrategia:</strong> ${d.estrategia}</p>
                     
-                    <div class="instruccion-box">
-                        <strong>📲 Despliegue Táctico:</strong>
-                        <input type="text" id="instruccion_${id}" class="instruccion-input" placeholder="Ej: Reforzar barrido en zona norte...">
-                        <button class="btn-accion btn-wa" onclick="enviarWhatsApp('${id}')">Enviar Misión por WhatsApp</button>
+                    <div style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                        <input type="text" id="instruccion_${id}" class="instruccion-input" placeholder="Instrucción / Despliegue Táctico...">
+                        <button class="btn-accion" style="background:#25D366; color:white; border:none;" onclick="enviarWhatsApp('${id}')">Enviar Misión (WhatsApp)</button>
+                        <button class="btn-accion" style="background:#3b82f6; color:white; border:none;" onclick="trazarRuta(${d.lat}, ${d.lng})">📍 Ruta de Acceso (Maps)</button>
                     </div>
-                    <button class="btn-accion btn-ruta" onclick="trazarRuta(${d.lat}, ${d.lng})">📍 Trazar Ruta (Google Maps)</button>
                 </div>
             `;
 
             for (let s in marcadoresOriginales) {
                 let m = marcadoresOriginales[s];
-                if (s === id) { m.setStyle({ radius: 15, fillOpacity: 1 }); m.bringToFront(); if(m.getElement()) m.getElement().classList.add('pulsing-marker'); }
-                else { m.setStyle({ radius: 7, fillOpacity: 0.3 }); if(m.getElement()) m.getElement().classList.remove('pulsing-marker'); }
+                if (s === id) { m.setStyle({ radius: 12, fillOpacity: 1 }); m.bringToFront(); }
+                else { m.setStyle({ radius: 6, fillOpacity: 0.3 }); }
             }
             map.flyTo([d.lat, d.lng], 16, { animate: true, duration: 1.5 });
         }
 
         function enviarWhatsApp(id) {
             const d = dbSecciones[id];
-            const instruccion = document.getElementById('instruccion_'+id).value;
-            if(!d.telefono || d.telefono.length < 10) {
-                alert("No hay un número válido en la Base Maestra para esta sección.");
+            const instruccion = document.getElementById('instruccion_'+id).value || "Atender sección conforme a estrategia.";
+            
+            if(!d.telefono || d.telefono === "S/N" || d.telefono.length < 10) {
+                alert("Número de teléfono no disponible en la Base Maestra.");
                 return;
             }
-            let mensaje = `🚨 *OBJETIVO C4: SECCIÓN ${id}*\n📍 *Sector:* ${d.sector}\n🎯 *Estrategia:* ${d.estrategia}\n👥 *Lista Nominal:* ${d.nominal}\n⚠️ *Prioridad:* ${d.riesgo}\n\n📋 *INSTRUCCIÓN:* ${instruccion || "Acudir a la sección indicada para barrido territorial."}\n\n🗺️ *Ruta:* https://www.google.com/maps/dir/?api=1&destination=$${d.lat},${d.lng}`;
+            
+            // WHATSAPP MINIMALISTA (Solo instrucción y ruta)
+            let mensaje = `*INSTRUCCIÓN SECCIÓN ${id}*\n\n${instruccion}\n\n🗺️ *Ruta Maps:* https://www.google.com/maps/search/?api=1&query=${d.lat},${d.lng}`;
             let encodedMsg = encodeURIComponent(mensaje);
             window.open(`https://wa.me/52${d.telefono}?text=${encodedMsg}`, '_blank');
         }
 
         function trazarRuta(lat, lng) {
-            window.open(`https://www.google.com/maps/dir/?api=1&destination=$${lat},${lng}`, '_blank');
+            window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
         }
     </script>
 </body>
