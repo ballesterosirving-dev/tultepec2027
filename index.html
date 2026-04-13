@@ -22,7 +22,6 @@
         #sidebar { width: 380px; background: #f9fafb; padding: 20px; border-right: 1px solid #e5e7eb; overflow-y: auto; z-index: 1000; display: flex; flex-direction: column; }
         #map { flex-grow: 1; height: 100%; position: relative; z-index: 1; }
         
-        /* BUSCADOR: Letra más pequeña y fina para móvil */
         #buscador { width: 100%; padding: 10px; border: 1px solid #ccc; font-size: 12px; color: #333; background: white; margin-bottom: 5px; border-radius: 6px; }
         #buscador optgroup { font-size: 12px; font-weight: bold; color: #111; }
         #buscador option { font-size: 11px; color: #444; }
@@ -30,6 +29,13 @@
         .tarjeta-blanca { background: #ffffff; border: 1px solid #ccc; padding: 15px; margin-top: 15px; font-size: 12px; line-height: 1.5; border-radius: 6px;}
         .tarjeta-blanca p { margin: 5px 0; }
         .tarjeta-blanca strong { color: #000; }
+        
+        .badge { display: inline-block; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; color: white; text-align: center; margin-left: 5px; }
+        .bg-mantener { background-color: #f59e0b; }
+        .bg-movilizar { background-color: #ef4444; }
+        .bg-gestion { background-color: #10b981; }
+        .bg-blindaje { background-color: #8b5cf6; }
+        .bg-persuadir { background-color: #3b82f6; }
         
         .btn-accion { display: block; width: 100%; padding: 12px; color: #000; border: 1px solid #ccc; background: #f9fafb; cursor: pointer; text-align: center; margin-top: 10px; font-size: 12px; text-decoration: none; border-radius: 6px; font-weight: bold;}
         .btn-accion:active { background: #e5e7eb; }
@@ -157,20 +163,18 @@
                     sectores[nombreSector].push(row);
                 });
 
-                // ORDENAMIENTO FORZADO DE SECTORES (A-Z)
                 let sectoresOrdenados = Object.keys(sectores).sort((a, b) => {
                     return a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'});
                 });
 
-                // Llenado del Buscador con el orden correcto
                 sectoresOrdenados.forEach(sec => {
                     let optgroup = document.createElement('optgroup');
-                    let shortSector = sec.split("(")[0]; // Corta en el paréntesis para no hacer bulto
+                    let shortSector = sec.split("(")[0];
                     optgroup.label = shortSector;
                     
                     sectores[sec].forEach(row => {
                         let colFull = row.Localidades_Colonias || "";
-                        let shortCol = colFull.substring(0, 30); // 30 caracteres máximo
+                        let shortCol = colFull.substring(0, 30);
                         if(colFull.length > 30) shortCol += "...";
                         
                         let opt = document.createElement('option');
@@ -196,7 +200,13 @@
             capaMarcadores.clearLayers();
             for (let id in dbSecciones) {
                 let d = dbSecciones[id];
-                let color = '#333'; 
+                let color = '#3b82f6';
+                let est = (d.estrategia || "").toUpperCase();
+                if(est.includes('MANTENER')) color = '#f59e0b';
+                if(est.includes('MOVILIZAR')) color = '#ef4444';
+                if(est.includes('GESTIÓN')) color = '#10b981';
+                if(est.includes('BLINDAJE')) color = '#8b5cf6';
+
                 let m = L.circleMarker([d.lat, d.lng], { radius: 8, fillColor: color, color: '#fff', weight: 1, fillOpacity: 0.8 }).addTo(capaMarcadores);
                 m.on('click', () => { document.getElementById('buscador').value = id; seleccionarSeccion(id); });
                 marcadoresOriginales[id] = m;
@@ -208,6 +218,13 @@
             if(!id) return;
             const d = dbSecciones[id];
             
+            let colorClass = 'bg-persuadir';
+            let est = (d.estrategia || "").toUpperCase();
+            if(est.includes('MANTENER')) colorClass = 'bg-mantener';
+            if(est.includes('MOVILIZAR')) colorClass = 'bg-movilizar';
+            if(est.includes('GESTIÓN')) colorClass = 'bg-gestion';
+            if(est.includes('BLINDAJE')) colorClass = 'bg-blindaje';
+
             document.getElementById('details').innerHTML = `
                 <div class="tarjeta-blanca">
                     <p><strong>Sección:</strong> ${id}</p>
@@ -217,7 +234,7 @@
                     <p><strong>Delimitadores:</strong> ${d.limites}</p>
                     <p><strong>Lista Nominal:</strong> ${d.nominal}</p>
                     <p><strong>Prioridad:</strong> ${d.riesgo}</p>
-                    <p><strong>Estrategia:</strong> ${d.estrategia}</p>
+                    <p><strong>Estrategia:</strong> <span class="badge ${colorClass}">${d.estrategia}</span></p>
                     
                     <div style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px;">
                         <input type="text" id="instruccion_${id}" class="instruccion-input" placeholder="Instrucción / Despliegue Táctico...">
@@ -244,7 +261,6 @@
                 return;
             }
             
-            // WHATSAPP MINIMALISTA: Solo Instrucción y Link de Google Maps oficial
             let rutaMaps = `https://www.google.com/maps/dir/?api=1&destination=${d.lat},${d.lng}`;
             let mensaje = `*INSTRUCCIÓN SECCIÓN ${id}*\n\n${instruccion}\n\n🗺️ *Ruta:* ${rutaMaps}`;
             
@@ -253,7 +269,6 @@
         }
 
         function trazarRuta(lat, lng) {
-            // URL OFICIAL DE RUTEO EN GOOGLE MAPS
             window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
         }
     </script>
