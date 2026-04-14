@@ -4,47 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Inteligencia Territorial</title>
+    <title>Tultepec27 - Inteligencia Territorial</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <style>
-        body { margin: 0; font-family: Arial, sans-serif; background: #f3f4f6; height: 100vh; overflow: hidden; color: #333; }
+        :root { --morena: #b3282d; --bg: #f3f4f6; --text-main: #111827; --text-muted: #6b7280; --border: #e5e7eb; }
+        body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
         
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .login-box { width: 90%; max-width: 320px; }
+        .login-box { width: 90%; max-width: 320px; text-align: center; }
         .login-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; text-align: center; border-radius: 6px;}
-        .btn-login { width: 100%; padding: 12px; background: #111; color: white; border: none; font-size: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; border-radius: 6px; }
-        .btn-login:active { background: #333; }
+        .btn-login { width: 100%; padding: 12px; background: var(--text-main); color: white; border: none; font-size: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; border-radius: 6px; }
         
-        #app-screen { display: none; height: 100%; flex-direction: row; }
-        #sidebar { width: 380px; background: #f9fafb; padding: 20px; border-right: 1px solid #e5e7eb; overflow-y: auto; z-index: 1000; display: flex; flex-direction: column; }
+        #app-screen { display: none; height: 100%; flex-direction: row; width: 100%; }
+        #sidebar { width: 400px; background: white; padding: 20px; box-shadow: 4px 0 10px rgba(0,0,0,0.05); overflow-y: auto; z-index: 1000; display: flex; flex-direction: column; }
         #map { flex-grow: 1; height: 100%; position: relative; z-index: 1; }
         
-        #buscador { width: 100%; padding: 10px; border: 1px solid #ccc; font-size: 12px; color: #333; background: white; margin-bottom: 5px; border-radius: 6px; }
+        #buscador { width: 100%; padding: 10px; border: 1px solid #ccc; font-size: 13px; color: #333; background: white; margin-bottom: 15px; border-radius: 6px; }
         #buscador optgroup { font-size: 12px; font-weight: bold; color: #111; }
-        #buscador option { font-size: 11px; color: #444; }
+        #buscador option { font-size: 12px; color: #444; }
         
-        .tarjeta-blanca { background: #ffffff; border: 1px solid #ccc; padding: 15px; margin-top: 15px; font-size: 12px; line-height: 1.5; border-radius: 6px;}
-        .tarjeta-blanca p { margin: 5px 0; }
-        .tarjeta-blanca strong { color: #000; }
+        /* ESTILOS APROBADOS MÓDULO 4 */
+        .ficha-tecnica { font-size: 14px; color: #333; background: white; padding: 15px; border: 1px solid #ccc; border-radius: 8px; margin-top: 15px;}
+        .ficha-tecnica p { margin: 10px 0; border-bottom: 1px solid #f3f4f6; padding-bottom: 8px; word-wrap: break-word; }
+        .ficha-tecnica strong { color: var(--text-muted); display: block; margin-bottom: 2px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .badge { display: inline-block; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; color: white; text-align: center; margin-left: 5px; }
-        .bg-mantener { background-color: #f59e0b; }
-        .bg-movilizar { background-color: #ef4444; }
-        .bg-gestion { background-color: #10b981; }
-        .bg-blindaje { background-color: #8b5cf6; }
-        .bg-persuadir { background-color: #3b82f6; }
+        .input-referente { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+        .btn-guardar { background-color: #f3f4f6; border: 1px solid #ccc; padding: 10px; width: 100%; border-radius: 6px; font-weight: bold; margin-top: 8px; cursor: pointer; font-size: 13px; color: #333;}
+        .btn-guardar:active { background: #e5e7eb; }
         
-        .btn-accion { display: block; width: 100%; padding: 12px; color: #000; border: 1px solid #ccc; background: #f9fafb; cursor: pointer; text-align: center; margin-top: 10px; font-size: 12px; text-decoration: none; border-radius: 6px; font-weight: bold;}
-        .btn-accion:active { background: #e5e7eb; }
+        .btn-accion { display: block; width: 100%; padding: 14px; border: 1px solid #ccc; background: #f9fafb; cursor: pointer; text-align: center; margin-top: 10px; font-size: 13px; border-radius: 8px; font-weight: bold; text-decoration: none;}
+        .btn-mapa { background: #3b82f6; color: white; border: none; font-size: 14px; padding: 16px; margin-top: 15px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);}
+        .btn-wa { background:#25D366; color:white; border:none; }
         
-        .instruccion-input { width: 100%; padding: 10px; border: 1px solid #ccc; font-size: 13px; margin-top: 10px; margin-bottom: 5px; box-sizing: border-box; border-radius: 6px;}
+        .instruccion-input { width: 100%; padding: 12px; border: 1px solid #ccc; font-size: 14px; margin-top: 10px; margin-bottom: 5px; box-sizing: border-box; border-radius: 6px;}
+        
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; color: white; margin-top: 5px; text-align: center; }
+        .bg-mantener { background-color: #f59e0b; } .bg-movilizar { background-color: #ef4444; } .bg-gestion { background-color: #10b981; } .bg-blindaje { background-color: #8b5cf6; } .bg-persuadir { background-color: #3b82f6; }
+
+        /* MODAL EVIDENCIAS */
+        #modal-evidencia { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 320px; }
+        .modal-select, .modal-textarea { width: 100%; padding: 10px; margin-top: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
+
+        .pulsing-marker { animation: pulse 1.2s infinite alternate; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.6); opacity: 1; } }
 
         @media (max-width: 768px) {
             #app-screen { flex-direction: column; }
-            #sidebar { width: 100%; height: 50vh; order: 2; padding: 15px; border-right: none; border-top: 1px solid #ccc; }
+            #sidebar { width: 100%; height: 50vh; order: 2; padding: 15px; border-right: none; border-top: 1px solid #ccc; border-radius: 20px 20px 0 0; margin-top: -20px;}
             #map { width: 100%; height: 50vh; order: 1; }
         }
     </style>
@@ -53,35 +63,52 @@
 
     <div id="login-screen">
         <div class="login-box">
-            <input type="text" id="user" class="login-input" placeholder="Usuario" autocomplete="off" autocapitalize="off">
-            <input type="password" id="pin" class="login-input" placeholder="PIN" inputmode="numeric" pattern="[0-9]*">
-            <button class="btn-login" onclick="iniciarSesion()">Acceder</button>
-            <div id="loader" style="display:none; margin-top:15px; font-size:13px; color:#666; text-align:center;">Validando Seguridad...</div>
+            <h1 style="color: var(--morena); border-bottom: 3px solid var(--morena); padding-bottom: 10px; margin-bottom: 30px; font-size: 26px;">📍 C4 - TULTEPEC 27</h1>
+            <input type="text" id="user" class="login-input" placeholder="Usuario Operativo" autocomplete="off" autocapitalize="off">
+            <input type="password" id="pin" class="login-input" placeholder="PIN de Seguridad" inputmode="numeric" pattern="[0-9]*">
+            <button class="btn-login" onclick="iniciarSesion()">Ingresar al Territorio</button>
+            <div id="loader" style="display:none; margin-top:15px; font-size:13px; color:#666; text-align:center;">Validando Encriptación...</div>
         </div>
     </div>
 
     <div id="app-screen">
         <div id="sidebar">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <span style="font-size: 14px; font-weight: bold; color: #111;">Operación Territorial</span>
-                <span id="user-info" style="font-size: 11px; color: #666; border: 1px solid #ccc; padding: 3px 8px; border-radius: 4px;"></span>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--morena); padding-bottom: 12px; margin-bottom: 15px;">
+                <h2 style="margin: 0; font-size: 20px; color: var(--text-main);">Tultepec27</h2>
+                <span id="user-info" style="background: #f9fafb; border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: bold; color: var(--morena);"></span>
             </div>
             
             <select id="buscador" onchange="seleccionarSeccion(this.value)">
-                <option value="">Seleccionar Sección...</option>
+                <option value="">🔍 Seleccionar Sección...</option>
             </select>
 
             <div id="details">
-                <p style="font-size: 12px; color: #666; text-align: center; margin-top: 30px;">Seleccione una sección para iniciar el despliegue.</p>
+                <p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-top: 40px;"><em>Autenticación exitosa. Selecciona una sección para iniciar operaciones.</em></p>
             </div>
         </div>
         <div id="map"></div>
     </div>
 
+    <div id="modal-evidencia">
+        <div class="modal-content">
+            <h3 style="margin-top:0; font-size:16px; border-bottom:2px solid #ccc; padding-bottom:8px;">📸 Reporte de Campo: <span id="lbl-seccion-modal"></span></h3>
+            <select id="tipo-incidencia" class="modal-select">
+                <option value="Auditoria Lona/Barda">🚩 Auditoría (Lona/Barda)</option>
+                <option value="Gestion Social">🤝 Petición / Gestión Social</option>
+                <option value="Incidencia Urbana">⚠️ Incidencia Urbana (Bache/Luz)</option>
+            </select>
+            <textarea id="nota-evidencia" class="modal-textarea" rows="3" placeholder="Describe brevemente el hallazgo..."></textarea>
+            <button class="btn-accion" style="background:#111; color:white; border:none;" onclick="enviarEvidencia()">Enviar Reporte a C4</button>
+            <button class="btn-accion" style="background:#f3f4f6; color:#666; border:none;" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
+
     <script>
+        // PEGA AQUÍ TU URL ACTIVA DE APPS SCRIPT
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVwTIjQuPnCONAVjX0SKchrkA50VGTEVNe1NSi0LODgilmNq13xh3MzaWRQ0CQiMC0WA/exec";
         
         let map; let capaMarcadores; let marcadoresOriginales = {}; let dbSecciones = {}; let datosUsuario = {};
+        let seccionActiva = "";
 
         function initMap() {
             map = L.map('map', { zoomControl: false }).setView([19.6842, -99.1286], 13);
@@ -103,19 +130,18 @@
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({ action: 'login', usuario: user, pin: pin })
                 });
-                
                 const result = await response.json();
                 
                 if (result.status === 'success') {
-                    datosUsuario = result;
-                    document.getElementById('user-info').innerText = datosUsuario.rol;
+                    datosUsuario = { user: user, rol: result.rol, sectorPermitido: result.sectorPermitido };
+                    document.getElementById('user-info').innerText = `👤 ${datosUsuario.rol}`;
                     cargarTerritorio();
                 } else {
-                    alert("Credenciales incorrectas.");
+                    alert("Acceso denegado. Credenciales incorrectas.");
                     document.getElementById('loader').style.display = "none";
                 }
             } catch (error) {
-                alert("Error de conexión con el Servidor Central.");
+                alert("Error de conexión con el Servidor.");
                 document.getElementById('loader').style.display = "none";
             }
         }
@@ -127,19 +153,17 @@
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify({ action: 'getData', rol: datosUsuario.rol, sector: datosUsuario.sectorPermitido })
                 });
-                
                 let data = await response.json();
 
                 const buscador = document.getElementById('buscador');
-                buscador.innerHTML = '<option value="">Seleccionar Sección...</option>';
-                
+                buscador.innerHTML = '<option value="">🔍 Seleccionar Sección...</option>';
                 let sectores = {};
                 
                 data.forEach(row => {
                     if(row.Seccion === '6638' || row.Seccion === 6638) return; 
 
                     let telReal = row.Telefono || row.Teléfono || row.TELEFONO || row.Tel || "S/N";
-
+                    let idMapa = row.ID_Mapa || row.ID_MAPA || row.id_mapa || "";
                     let lat = 19.684 + (Math.random() * 0.02 - 0.01);
                     let lng = -99.128 + (Math.random() * 0.02 - 0.01);
                     
@@ -147,15 +171,11 @@
                         sector: row.Sector_Geografico_Operativo_Plan_A,
                         col: row.Localidades_Colonias,
                         limites: row.Delimitadores_Geograficos,
-                        nse: row.NSE_Pobreza,
                         nominal: row.Lista_Nominal,
-                        votacion: row.Votacion_Est,
-                        ganador: row.Ganador_Hist,
                         riesgo: row.Prioridad_Riesgo,
                         estrategia: row.Estrategia_Asignada,
                         referente: row.REFERENTE || row.Referente || "No asignado",
-                        telefono: telReal,
-                        lat: lat, lng: lng
+                        telefono: telReal, id_mapa: idMapa, lat: lat, lng: lng
                     };
 
                     let nombreSector = row.Sector_Geografico_Operativo_Plan_A || "Sin Sector";
@@ -163,20 +183,14 @@
                     sectores[nombreSector].push(row);
                 });
 
-                let sectoresOrdenados = Object.keys(sectores).sort((a, b) => {
-                    return a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'});
-                });
+                let sectoresOrdenados = Object.keys(sectores).sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'}));
 
                 sectoresOrdenados.forEach(sec => {
                     let optgroup = document.createElement('optgroup');
-                    let shortSector = sec.split("(")[0];
-                    optgroup.label = shortSector;
-                    
+                    optgroup.label = sec.split("(")[0];
                     sectores[sec].forEach(row => {
-                        let colFull = row.Localidades_Colonias || "";
-                        let shortCol = colFull.substring(0, 30);
-                        if(colFull.length > 30) shortCol += "...";
-                        
+                        let shortCol = (row.Localidades_Colonias || "").substring(0, 30);
+                        if((row.Localidades_Colonias || "").length > 30) shortCol += "...";
                         let opt = document.createElement('option');
                         opt.value = row.Seccion;
                         opt.textContent = `${row.Seccion} - ${shortCol}`;
@@ -187,9 +201,7 @@
 
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-screen').style.display = 'flex';
-                
-                initMap();
-                dibujarMarcadores();
+                initMap(); dibujarMarcadores();
 
             } catch (error) {
                 alert("Error al procesar la base de datos maestra.");
@@ -207,7 +219,7 @@
                 if(est.includes('GESTIÓN')) color = '#10b981';
                 if(est.includes('BLINDAJE')) color = '#8b5cf6';
 
-                let m = L.circleMarker([d.lat, d.lng], { radius: 8, fillColor: color, color: '#fff', weight: 1, fillOpacity: 0.8 }).addTo(capaMarcadores);
+                let m = L.circleMarker([d.lat, d.lng], { radius: 10, fillColor: color, color: '#fff', weight: 2, fillOpacity: 0.9 }).addTo(capaMarcadores);
                 m.on('click', () => { document.getElementById('buscador').value = id; seleccionarSeccion(id); });
                 marcadoresOriginales[id] = m;
             }
@@ -216,6 +228,7 @@
 
         function seleccionarSeccion(id) {
             if(!id) return;
+            seccionActiva = id;
             const d = dbSecciones[id];
             
             let colorClass = 'bg-persuadir';
@@ -225,51 +238,106 @@
             if(est.includes('GESTIÓN')) colorClass = 'bg-gestion';
             if(est.includes('BLINDAJE')) colorClass = 'bg-blindaje';
 
+            let btnPdfHtml = d.id_mapa 
+                ? `<button class="btn-accion btn-mapa" onclick="abrirPDF('${d.id_mapa}')">🗺️ VER CARTOGRAFÍA OFICIAL (PDF)</button>`
+                : `<button class="btn-accion btn-mapa" style="background:#9ca3af; cursor:not-allowed;">🗺️ PDF No Vinculado</button>`;
+
             document.getElementById('details').innerHTML = `
-                <div class="tarjeta-blanca">
-                    <p><strong>Sección:</strong> ${id}</p>
-                    <p><strong>Sector:</strong> ${d.sector}</p>
-                    <p><strong>Referente:</strong> ${d.referente} | <strong>Tel:</strong> ${d.telefono}</p>
+                <div style="background: var(--morena); color: white; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                    <h2 style="margin:0; font-size: 18px;">SECCIÓN ${id}</h2>
+                    <p style="margin:2px 0 0; font-size:11px; opacity:0.9;">${d.sector}</p>
+                </div>
+                
+                <div class="ficha-tecnica">
+                    <p style="margin-top:0;"><strong>Referente Territorial:</strong>
+                        <input type="text" id="input_${id}" class="input-referente" value="${d.referente !== 'nan' ? d.referente : 'Por asignar'}">
+                        <button class="btn-guardar" onclick="guardarReferente('${id}')">💾 Guardar Cambios</button>
+                        <p id="msg_${id}" style="display:none; color:#10b981; font-size:11px; margin-top:8px; font-weight:bold; text-align:center;">¡Sincronizado en Excel!</p>
+                    </p>
                     <p><strong>Colonias:</strong> ${d.col}</p>
                     <p><strong>Delimitadores:</strong> ${d.limites}</p>
                     <p><strong>Lista Nominal:</strong> ${d.nominal}</p>
-                    <p><strong>Prioridad:</strong> ${d.riesgo}</p>
-                    <p><strong>Estrategia:</strong> <span class="badge ${colorClass}">${d.estrategia}</span></p>
-                    
-                    <div style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px;">
-                        <input type="text" id="instruccion_${id}" class="instruccion-input" placeholder="Instrucción / Despliegue Táctico...">
-                        <button class="btn-accion" style="background:#25D366; color:white; border:none;" onclick="enviarWhatsApp('${id}')">Enviar Misión (WhatsApp)</button>
-                        <button class="btn-accion" style="background:#3b82f6; color:white; border:none;" onclick="trazarRuta(${d.lat}, ${d.lng})">📍 Ruta de Acceso (Maps)</button>
-                    </div>
+                    <p><strong>Prioridad / Riesgo:</strong> ${d.riesgo}</p>
+                    <p style="border-bottom:none;"><strong>Estrategia:</strong> <span class="badge ${colorClass}">${d.estrategia}</span></p>
+                </div>
+
+                ${btnPdfHtml}
+
+                <div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                    <input type="text" id="instruccion_${id}" class="instruccion-input" placeholder="Instrucción Táctica (Opcional)...">
+                    <button class="btn-accion btn-wa" onclick="enviarWhatsApp('${id}')">📲 Enviar Misión (WhatsApp)</button>
+                    <button class="btn-accion" style="background:#111; color:white; border:none;" onclick="trazarRuta(${d.lat}, ${d.lng})">📍 Ruta de Acceso (Maps)</button>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <button class="btn-accion" style="background:#f3f4f6; color:#333; border:1px solid #ccc;" onclick="abrirModalEvidencia()">📸 Levantar Incidencia</button>
                 </div>
             `;
 
             for (let s in marcadoresOriginales) {
                 let m = marcadoresOriginales[s];
-                if (s === id) { m.setStyle({ radius: 12, fillOpacity: 1 }); m.bringToFront(); }
-                else { m.setStyle({ radius: 6, fillOpacity: 0.3 }); }
+                if (s === id) { m.setStyle({ radius: 15, fillOpacity: 1 }); m.bringToFront(); if(m.getElement()) m.getElement().classList.add('pulsing-marker'); }
+                else { m.setStyle({ radius: 7, fillOpacity: 0.3 }); if(m.getElement()) m.getElement().classList.remove('pulsing-marker'); }
             }
             map.flyTo([d.lat, d.lng], 16, { animate: true, duration: 1.5 });
         }
 
+        async function guardarReferente(id) {
+            const nuevoVal = document.getElementById('input_'+id).value;
+            dbSecciones[id].referente = nuevoVal;
+            
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ action: 'updateReferente', seccion: id, nuevoReferente: nuevoVal })
+                });
+                document.getElementById('msg_'+id).style.display = "block";
+                setTimeout(() => { document.getElementById('msg_'+id).style.display = "none"; }, 3000);
+            } catch(e) {
+                alert("Error al sincronizar con la Base de Datos.");
+            }
+        }
+
+        function abrirPDF(idArchivo) { window.open(`https://drive.google.com/file/d/${idArchivo}/view`, '_blank'); }
+
         function enviarWhatsApp(id) {
             const d = dbSecciones[id];
             const instruccion = document.getElementById('instruccion_'+id).value || "Atender sección conforme a estrategia.";
-            
-            if(!d.telefono || d.telefono === "S/N" || d.telefono.length < 10) {
-                alert("Número de teléfono no disponible en la Base Maestra.");
-                return;
-            }
-            
+            if(!d.telefono || d.telefono === "S/N" || d.telefono.length < 10) return alert("Teléfono no disponible en la Base.");
             let rutaMaps = `https://www.google.com/maps/dir/?api=1&destination=${d.lat},${d.lng}`;
             let mensaje = `*INSTRUCCIÓN SECCIÓN ${id}*\n\n${instruccion}\n\n🗺️ *Ruta:* ${rutaMaps}`;
-            
-            let encodedMsg = encodeURIComponent(mensaje);
-            window.open(`https://wa.me/52${d.telefono}?text=${encodedMsg}`, '_blank');
+            window.open(`https://wa.me/52${d.telefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
-        function trazarRuta(lat, lng) {
-            window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
+        function trazarRuta(lat, lng) { window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank'); }
+
+        function abrirModalEvidencia() {
+            document.getElementById('lbl-seccion-modal').innerText = seccionActiva;
+            document.getElementById('modal-evidencia').style.display = 'flex';
+        }
+        
+        function cerrarModal() {
+            document.getElementById('modal-evidencia').style.display = 'none';
+            document.getElementById('nota-evidencia').value = '';
+        }
+
+        async function enviarEvidencia() {
+            let tipo = document.getElementById('tipo-incidencia').value;
+            let nota = document.getElementById('nota-evidencia').value;
+            if(!nota) return alert("Debe incluir una descripción.");
+            
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ action: 'saveEvidence', datos: { seccion: seccionActiva, tipo: tipo, nota: nota, usuario: datosUsuario.user } })
+                });
+                alert("Reporte enviado al Centro de Comando.");
+                cerrarModal();
+            } catch(e) {
+                alert("Error al enviar el reporte.");
+            }
         }
     </script>
 </body>
